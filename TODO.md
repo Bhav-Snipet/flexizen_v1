@@ -8,5 +8,6 @@
 - [ ] Create `backend/src/main/resources/spring-security.xml` (HTTP security rules, login/logout, CSRF, session settings, ROLE_ADMIN intercept).
 - [ ] Create/verify `backend/src/main/resources/META-INF/persistence.xml` (PersistenceUnit + Hibernate dialect + DDL mode).
 - [ ] Add `backend/src/main/resources/schema.sql` and `backend/src/main/resources/data.sql`.
-- [ ] Run `mvn package` in `backend/` to verify build.
+- [x] Run `mvn package` in `backend/` to verify build.
+
 
