@@ -35,5 +35,9 @@ build/
 ### VS Code ###
 .vscode/
 
+# Local project TODO tracking
+TODO.md
+
+
 ### Mac OS ###
 .DS_Store
