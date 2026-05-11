@@ -10,4 +10,21 @@
 - [ ] Add `backend/src/main/resources/schema.sql` and `backend/src/main/resources/data.sql`.
 - [x] Run `mvn package` in `backend/` to verify build.
 
+## Phase 2 — Authentication & Session Security (Week 2)
+- [ ] Verify `Admin` entity, seed admin in `data.sql`.
+- [ ] Verify `spring-security.xml` mappings.
+- [ ] Verify `/login` UI endpoint and session behavior.
+
+## Phase 3 — Class Management Module (Week 3)
+- [x] `ClassRepository`
+- [x] `ClassService`
+- [x] `ClassController`
+
+## Phase 4 — Booking Module (Week 4)
+- [ ] Add `BookingRepository`
+- [ ] Add `BookingService`
+- [x] Add `BookingController` REST endpoints
+- [x] Add user-side booking endpoint (create)
+- [x] Add admin endpoints (approve/cancel/remark/status queries by tab)
+
 
