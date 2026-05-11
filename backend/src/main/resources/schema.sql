@@ -1,0 +1,49 @@
+-- FlexiZen schema for PostgreSQL
+
+CREATE TABLE IF NOT EXISTS admin (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(150)
+);
+
+CREATE TABLE IF NOT EXISTS yoga_class (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    schedule VARCHAR(200),
+    capacity INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    phone VARCHAR(50),
+    email VARCHAR(150)
+);
+
+CREATE TABLE IF NOT EXISTS booking (
+    id BIGSERIAL PRIMARY KEY,
+    booking_no VARCHAR(50) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    class_id BIGINT NOT NULL REFERENCES yoga_class(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL,
+    remark TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS enquiry (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    read_status VARCHAR(10) NOT NULL DEFAULT 'UNREAD',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS page_content (
+    id BIGSERIAL PRIMARY KEY,
+    page_type VARCHAR(50) NOT NULL UNIQUE,
+    content TEXT NOT NULL
+);
+
