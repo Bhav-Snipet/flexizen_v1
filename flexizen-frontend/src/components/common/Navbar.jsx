@@ -14,7 +14,8 @@ const Navbar = () => {
                     <div className="flex space-x-8 items-center">
                         <Link to="/" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Home</Link>
                         <Link to="/classes" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Classes</Link>
-                        {/* More links added in future phases */}
+                        <Link to="/about" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">About Us</Link>
+                        <Link to="/contact" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Contact Us</Link>
                     </div>
                 </div>
             </div>
