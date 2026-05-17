@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Calendar, Users } from 'lucide-react';
 
 const ClassCard = ({ yogaClass }) => {
@@ -26,12 +27,12 @@ const ClassCard = ({ yogaClass }) => {
                     </div>
                 </div>
                 
-                <button 
-                    className="w-full py-2.5 bg-indigo-50 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center space-x-2 group"
-                    onClick={() => alert('Booking flow will be implemented in Phase 4')}
+                <Link 
+                    to={`/book/${yogaClass.id}`}
+                    className="w-full py-2.5 bg-indigo-50 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center space-x-2 group block text-center"
                 >
                     <span>Book Session</span>
-                </button>
+                </Link>
             </div>
         </div>
     );
