@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+             https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+
+  <!--
+    persistence.xml — JPA Persistence Unit
+    Used by LocalContainerEntityManagerFactoryBean in applicationContext.xml.
+    Entity scanning is done via packagesToScan — no need to list entities here.
+  -->
+  <persistence-unit name="flexizenPU" transaction-type="RESOURCE_LOCAL">
+
+    <!-- Hibernate as JPA provider -->
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <!--
+      No <class> entries needed — Spring's packagesToScan handles entity discovery.
+      Set exclude-unlisted-classes to false to allow auto-discovery.
+    -->
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+    <properties>
+      <!-- PostgreSQL dialect for Hibernate 6 -->
+      <property name="hibernate.dialect"
+                value="org.hibernate.dialect.PostgreSQLDialect"/>
+
+      <!-- DDL: validate ensures schema must exist (run schema.sql first) -->
+      <property name="hibernate.hbm2ddl.auto"     value="validate"/>
+      <property name="hibernate.show_sql"          value="true"/>
+      <property name="hibernate.format_sql"        value="true"/>
+      <property name="hibernate.jdbc.time_zone"    value="UTC"/>
+    </properties>
+
+  </persistence-unit>
+
+</persistence>

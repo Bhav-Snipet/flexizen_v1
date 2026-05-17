@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="
+               http://www.springframework.org/schema/security
+               http://www.springframework.org/schema/security/spring-security.xsd
+               http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!--
+    spring-security.xml — Spring Security Configuration
+    Session-based auth for admin. CSRF disabled for REST API.
+    Role: ROLE_ADMIN guards /api/admin/**
+  -->
+
+  <!-- ===== Authentication Manager ===== -->
+  <authentication-manager alias="authenticationManager">
+    <authentication-provider user-service-ref="customUserDetailsService">
+      <password-encoder ref="passwordEncoder"/>
+    </authentication-provider>
+  </authentication-manager>
+
+  <!-- ===== HTTP Security Rules ===== -->
+  <http pattern="/api/**" use-expressions="true">
+
+    <!-- Disable CSRF for REST (React sends JSESSIONID cookie via withCredentials) -->
+    <csrf disabled="true"/>
+
+    <!-- Session fixation protection -->
+    <session-management session-fixation-protection="newSession"/>
+
+    <!-- Public endpoints (no auth required) -->
+    <intercept-url pattern="/api/auth/**"            access="permitAll"/>
+    <intercept-url pattern="/api/user/**"            access="permitAll"/>
+    <intercept-url pattern="/api/classes/active"     access="permitAll"/>
+    <intercept-url pattern="/api/enquiries/submit"   access="permitAll"/>
+
+    <!-- Admin-only endpoints -->
+    <intercept-url pattern="/api/admin/**"           access="hasRole('ADMIN')"/>
+    <intercept-url pattern="/api/bookings/**"        access="hasRole('ADMIN')"/>
+    <intercept-url pattern="/api/classes/**"         access="hasRole('ADMIN')"/>
+    <intercept-url pattern="/api/enquiries/**"       access="hasRole('ADMIN')"/>
+    <intercept-url pattern="/api/reports/**"         access="hasRole('ADMIN')"/>
+    <intercept-url pattern="/api/search/**"          access="hasRole('ADMIN')"/>
+    <intercept-url pattern="/api/pages/**"           access="hasRole('ADMIN')"/>
+
+    <!-- Login endpoint -->
+    <form-login
+      login-processing-url="/api/auth/login"
+      username-parameter="username"
+      password-parameter="password"
+      authentication-success-handler-ref="loginSuccessHandler"
+      authentication-failure-handler-ref="loginFailureHandler"
+      permit-all="true"/>
+
+    <!-- Logout endpoint -->
+    <logout
+      logout-url="/api/auth/logout"
+      invalidate-session="true"
+      delete-cookies="JSESSIONID"
+      success-handler-ref="logoutSuccessHandler"/>
+
+    <!-- Unauthorized access: return 401 JSON (not redirect) -->
+    <access-denied-handler ref="accessDeniedHandler"/>
+
+    <http-basic disabled="true"/>
+
+  </http>
+
+  <!-- ===== REST Auth Entry Point — returns 401 JSON instead of redirect ===== -->
+  <beans:bean id="restAuthenticationEntryPoint"
+              class="com.flexizen.security.RestAuthenticationEntryPoint"/>
+
+  <!-- ===== Login Success Handler — returns 200 JSON ===== -->
+  <beans:bean id="loginSuccessHandler"
+              class="com.flexizen.security.LoginSuccessHandler"/>
+
+  <!-- ===== Login Failure Handler — returns 401 JSON ===== -->
+  <beans:bean id="loginFailureHandler"
+              class="com.flexizen.security.LoginFailureHandler"/>
+
+  <!-- ===== Logout Success Handler — returns 200 JSON ===== -->
+  <beans:bean id="logoutSuccessHandler"
+              class="com.flexizen.security.FlexiZenLogoutSuccessHandler"/>
+
+  <!-- ===== Access Denied Handler — returns 403 JSON ===== -->
+  <beans:bean id="accessDeniedHandler"
+              class="com.flexizen.security.CustomAccessDeniedHandler"/>
+
+</beans:beans>

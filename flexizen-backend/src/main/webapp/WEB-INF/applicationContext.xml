@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <!--
+    applicationContext.xml — Root Spring Context
+    Loaded by ContextLoaderListener in web.xml.
+    Covers: DataSource, JPA/EMF, TransactionManager, BCrypt, Services, Repositories.
+  -->
+
+  <!-- ===== Component Scan: services, repositories, security — exclude controllers ===== -->
+  <context:component-scan base-package="com.flexizen">
+    <context:exclude-filter type="annotation"
+      expression="org.springframework.stereotype.Controller"/>
+  </context:component-scan>
+
+  <!-- ===== HikariCP DataSource ===== -->
+  <!-- Update username/password/db name to match your PostgreSQL installation -->
+  <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    <property name="driverClassName" value="org.postgresql.Driver"/>
+    <property name="jdbcUrl"         value="jdbc:postgresql://localhost:5432/flexizen"/>
+    <property name="username"        value="postgres"/>
+    <property name="password"        value="postgres"/>
+    <property name="maximumPoolSize" value="10"/>
+    <property name="minimumIdle"     value="2"/>
+    <property name="idleTimeout"     value="30000"/>
+    <property name="connectionTimeout" value="20000"/>
+    <property name="poolName"        value="FlexiZenPool"/>
+  </bean>
+
+  <!-- ===== JPA EntityManagerFactory (Hibernate provider) ===== -->
+  <bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource"       ref="dataSource"/>
+    <property name="packagesToScan"   value="com.flexizen.model"/>
+    <property name="persistenceUnitName" value="flexizenPU"/>
+    <property name="jpaVendorAdapter">
+      <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="database"    value="POSTGRESQL"/>
+        <property name="showSql"     value="true"/>
+        <property name="generateDdl" value="false"/>
+      </bean>
+    </property>
+    <property name="jpaProperties">
+      <props>
+        <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+        <!-- validate: schema must exist (run schema.sql first); use create-drop only in dev -->
+        <prop key="hibernate.hbm2ddl.auto">validate</prop>
+        <prop key="hibernate.format_sql">true</prop>
+        <prop key="hibernate.jdbc.time_zone">UTC</prop>
+        <prop key="hibernate.enable_lazy_load_no_trans">false</prop>
+      </props>
+    </property>
+  </bean>
+
+  <!-- ===== JPA Transaction Manager ===== -->
+  <bean id="transactionManager"
+        class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory"/>
+  </bean>
+
+  <!-- ===== Enable @Transactional support ===== -->
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+
+  <!-- ===== BCryptPasswordEncoder (strength=10) ===== -->
+  <bean id="passwordEncoder"
+        class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+    <constructor-arg value="10"/>
+  </bean>
+
+</beans>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/mvc
+         http://www.springframework.org/schema/mvc/spring-mvc.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <!--
+    spring-mvc.xml — Spring MVC Web Context
+    Loaded by DispatcherServlet in web.xml.
+    Covers: controller scan, Jackson, CORS, static resources.
+  -->
+
+  <!-- ===== Scan only controllers ===== -->
+  <context:component-scan base-package="com.flexizen.controller"/>
+
+  <!-- ===== Enable MVC annotations with Jackson message converter ===== -->
+  <mvc:annotation-driven>
+    <mvc:message-converters>
+      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper">
+          <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+            <!-- Do not serialize null fields -->
+            <property name="serializationInclusion" value="NON_NULL"/>
+          </bean>
+        </property>
+      </bean>
+    </mvc:message-converters>
+  </mvc:annotation-driven>
+
+  <!-- ===== CORS — allow React dev server (Vite default: 5173) ===== -->
+  <mvc:cors>
+    <mvc:mapping path="/api/**"
+                 allowed-origins="http://localhost:5173"
+                 allowed-methods="GET,POST,PUT,DELETE,OPTIONS,PATCH"
+                 allowed-headers="*"
+                 allow-credentials="true"
+                 max-age="3600"/>
+  </mvc:cors>
+
+  <!-- ===== Default servlet handler for non-API static resources ===== -->
+  <mvc:default-servlet-handler/>
+
+</beans>
