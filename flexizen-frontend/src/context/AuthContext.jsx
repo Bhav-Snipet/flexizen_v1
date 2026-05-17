@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext();
@@ -8,19 +9,19 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const data = await authService.getProfile();
+                setUser(data);
+            } catch {
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         checkSession();
     }, []);
-
-    const checkSession = async () => {
-        try {
-            const data = await authService.getProfile();
-            setUser(data);
-        } catch (error) {
-            setUser(null);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const login = async (username, password) => {
         const data = await authService.login(username, password);

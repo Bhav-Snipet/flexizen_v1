@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
