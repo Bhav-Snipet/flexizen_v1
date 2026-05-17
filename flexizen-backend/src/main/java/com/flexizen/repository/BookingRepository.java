@@ -34,6 +34,13 @@ public class BookingRepository {
         return bookings.isEmpty() ? null : bookings.get(0);
     }
 
+    public List<Booking> findByDateRange(java.sql.Timestamp from, java.sql.Timestamp to) {
+        return entityManager.createQuery("SELECT b FROM Booking b WHERE b.createdAt BETWEEN :from AND :to ORDER BY b.createdAt DESC", Booking.class)
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getResultList();
+    }
+
     public void save(Booking booking) {
         if (booking.getId() == null) {
             entityManager.persist(booking);
