@@ -23,6 +23,10 @@ public class EnquiryRepository {
                 .getResultList();
     }
 
+    public Long countUnread() {
+        return entityManager.createQuery("SELECT COUNT(e) FROM Enquiry e WHERE e.readStatus = false", Long.class).getSingleResult();
+    }
+
     public Enquiry findById(Long id) {
         return entityManager.find(Enquiry.class, id);
     }

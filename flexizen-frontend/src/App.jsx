@@ -10,6 +10,9 @@ import ManageClasses from './pages/admin/ManageClasses';
 import ManageBookings from './pages/admin/ManageBookings';
 import ManagePages from './pages/admin/ManagePages';
 import Enquiry from './pages/admin/Enquiry';
+import Reports from './pages/admin/Reports';
+import SearchBooking from './pages/admin/SearchBooking';
+import AdminProfile from './pages/admin/AdminProfile';
 import PrivateRoute from './routes/PrivateRoute';
 import AdminRoute from './routes/AdminRoute';
 
@@ -34,7 +37,9 @@ function App() {
           <Route path="/admin/bookings" element={<ManageBookings />} />
           <Route path="/admin/pages" element={<ManagePages />} />
           <Route path="/admin/enquiries" element={<Enquiry />} />
-          {/* Add more admin routes here in future phases */}
+          <Route path="/admin/reports" element={<Reports />} />
+          <Route path="/admin/search" element={<SearchBooking />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
         </Route>
       </Route>
     </Routes>

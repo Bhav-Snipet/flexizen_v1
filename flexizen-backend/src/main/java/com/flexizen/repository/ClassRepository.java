@@ -21,6 +21,10 @@ public class ClassRepository {
         return entityManager.createQuery("SELECT y FROM YogaClass y WHERE y.active = true ORDER BY y.id DESC", YogaClass.class).getResultList();
     }
 
+    public Long countActive() {
+        return entityManager.createQuery("SELECT COUNT(y) FROM YogaClass y WHERE y.active = true", Long.class).getSingleResult();
+    }
+
     public YogaClass findById(Long id) {
         return entityManager.find(YogaClass.class, id);
     }

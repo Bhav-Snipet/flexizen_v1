@@ -1,6 +1,6 @@
 
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, CalendarDays, MessageSquare, FileText } from 'lucide-react';
+import { LayoutDashboard, Users, CalendarDays, MessageSquare, FileText, FileBarChart, Search, Settings } from 'lucide-react';
 
 const AdminSidebar = () => {
     const navItems = [
@@ -9,6 +9,9 @@ const AdminSidebar = () => {
         { path: '/admin/bookings', name: 'Manage Bookings', icon: CalendarDays },
         { path: '/admin/enquiries', name: 'Enquiries', icon: MessageSquare },
         { path: '/admin/pages', name: 'CMS Pages', icon: FileText },
+        { path: '/admin/reports', name: 'Reports', icon: FileBarChart },
+        { path: '/admin/search', name: 'Global Search', icon: Search },
+        { path: '/admin/profile', name: 'Account Settings', icon: Settings },
     ];
 
     return (

@@ -23,6 +23,12 @@ public class BookingRepository {
                 .getResultList();
     }
 
+    public Long countByStatus(String status) {
+        return entityManager.createQuery("SELECT COUNT(b) FROM Booking b WHERE b.status = :status", Long.class)
+                .setParameter("status", status)
+                .getSingleResult();
+    }
+
     public Booking findById(Long id) {
         return entityManager.find(Booking.class, id);
     }

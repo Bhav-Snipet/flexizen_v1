@@ -21,7 +21,11 @@ const Login = () => {
             await login(username, password);
             navigate('/admin/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || 'Invalid username or password');
+            if (!err.response) {
+                setError('Network Error: Cannot connect to server. Please ensure your Tomcat backend is running on port 8085.');
+            } else {
+                setError(err.response?.data?.message || 'Invalid username or password');
+            }
         } finally {
             setIsLoading(false);
         }

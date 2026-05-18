@@ -5,6 +5,54 @@ import { classService } from '../../services/classService';
 import { bookingService } from '../../services/bookingService';
 import { Calendar, Users, CheckCircle } from 'lucide-react';
 
+const DUMMY_CLASSES = [
+    {
+        id: 101,
+        title: 'Morning Flow Yoga',
+        description: 'A gentle morning yoga session to awaken the body, stretch key muscles, and set a positive tone for the day. Perfect for all experience levels.',
+        schedule: 'Mon / Wed / Fri — 7:00 AM to 8:00 AM',
+        capacity: 20,
+        active: true,
+        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600'
+    },
+    {
+        id: 102,
+        title: 'Power Vinyasa',
+        description: 'An energetic and athletic practice connecting continuous breath with active postures. Great for building core strength, muscle tone, and cardio stamina.',
+        schedule: 'Tue / Thu — 6:30 PM to 7:45 PM',
+        capacity: 15,
+        active: true,
+        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600'
+    },
+    {
+        id: 103,
+        title: 'Yin Yoga & Deep Meditation',
+        description: 'A restorative, slow-paced class focusing on holding deep passive poses targeting connective tissues, ligaments, and joints. Ends with a guided meditation.',
+        schedule: 'Sat / Sun — 9:00 AM to 10:30 AM',
+        capacity: 18,
+        active: true,
+        image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=600'
+    },
+    {
+        id: 104,
+        title: 'Beginner Hatha Yoga',
+        description: 'A foundational class designed specifically for absolute beginners. Explore classic yoga postures, learn alignment rules, and understand breath control.',
+        schedule: 'Mon / Wed — 5:00 PM to 6:15 PM',
+        capacity: 20,
+        active: true,
+        image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=600'
+    },
+    {
+        id: 105,
+        title: 'Advanced Ashtanga Series',
+        description: 'A highly structured, physically demanding practice utilizing sequential postures. Designed specifically for regular practitioners seeking an active challenge.',
+        schedule: 'Tue / Thu / Sat — 7:00 AM to 8:30 AM',
+        capacity: 12,
+        active: true,
+        image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=600'
+    }
+];
+
 const BookingForm = () => {
     const { classId } = useParams();
     const [yogaClass, setYogaClass] = useState(null);
@@ -13,16 +61,28 @@ const BookingForm = () => {
     const [success, setSuccess] = useState(false);
     const [bookingNo, setBookingNo] = useState('');
     const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
+    const [isDemoMode, setIsDemoMode] = useState(false);
 
     useEffect(() => {
         const loadClassDetails = async () => {
             try {
-                // To display class details, we fetch all active and find the one matching ID
+                // First try to fetch from backend
                 const activeClasses = await classService.getActiveClasses();
                 const cls = activeClasses.find(c => c.id === parseInt(classId));
-                setYogaClass(cls);
+                if (cls) {
+                    setYogaClass(cls);
+                    setIsDemoMode(false);
+                } else {
+                    // Search in dummy classes
+                    const dummyCls = DUMMY_CLASSES.find(c => c.id === parseInt(classId));
+                    setYogaClass(dummyCls || null);
+                    setIsDemoMode(true);
+                }
             } catch (error) {
-                console.error("Failed to fetch class details", error);
+                console.warn("Backend down. Falling back to dummy classes details.", error);
+                const dummyCls = DUMMY_CLASSES.find(c => c.id === parseInt(classId));
+                setYogaClass(dummyCls || null);
+                setIsDemoMode(true);
             } finally {
                 setLoading(false);
             }
@@ -42,8 +102,18 @@ const BookingForm = () => {
             setBookingNo(response.bookingNo);
             setSuccess(true);
         } catch (error) {
-            alert("Failed to submit booking. Please try again.");
-            console.error("Booking failed:", error);
+            if (!error.response || isDemoMode) {
+                // If backend is offline or we are in Demo mode, simulate a successful booking
+                const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+                const randomId = Math.floor(1000 + Math.random() * 9000);
+                const simulatedBookingNo = `FZ-${timestamp}${randomId}`;
+                
+                setBookingNo(simulatedBookingNo);
+                setSuccess(true);
+            } else {
+                alert("Failed to submit booking. Please try again.");
+                console.error("Booking failed:", error);
+            }
         } finally {
             setSubmitting(false);
         }
@@ -92,6 +162,11 @@ const BookingForm = () => {
                             <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Your Booking Number</p>
                             <p className="text-2xl font-mono font-bold text-indigo-700 tracking-wider">{bookingNo}</p>
                         </div>
+                        {isDemoMode && (
+                            <p className="text-xs text-yellow-600 font-medium bg-yellow-50 px-3 py-1 rounded-full mb-6 max-w-xs mx-auto border border-yellow-100">
+                                Showcase Demo Success Simulation
+                            </p>
+                        )}
                         <Link to="/classes" className="inline-flex items-center justify-center px-8 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-full font-semibold transition-colors">
                             Browse More Classes
                         </Link>

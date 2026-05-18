@@ -24,4 +24,16 @@ public class AdminRepository {
             return null;
         }
     }
+
+    public Admin findById(Long id) {
+        return entityManager.find(Admin.class, id);
+    }
+
+    public void save(Admin admin) {
+        if (admin.getId() == null) {
+            entityManager.persist(admin);
+        } else {
+            entityManager.merge(admin);
+        }
+    }
 }
