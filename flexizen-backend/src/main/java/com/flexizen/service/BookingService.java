@@ -27,6 +27,12 @@ public class BookingService {
     @Autowired
     private ClassRepository classRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private EmailService emailService;
+
     public Booking createBooking(AppUser userDetails, Long classId) {
         // 1. Check or save user (basic logic based on phone number)
         AppUser user = userRepository.findByPhone(userDetails.getPhone());
@@ -34,6 +40,9 @@ public class BookingService {
             user = new AppUser();
             user.setName(userDetails.getName());
             user.setPhone(userDetails.getPhone());
+            user.setEmail(userDetails.getEmail());
+            userRepository.save(user);
+        } else if (userDetails.getEmail() != null && !userDetails.getEmail().isBlank()) {
             user.setEmail(userDetails.getEmail());
             userRepository.save(user);
         }
@@ -55,6 +64,33 @@ public class BookingService {
         booking.setStatus("NEW");
 
         bookingRepository.save(booking);
+
+        // 5. Trigger notifications & emails (Future Scope)
+        try {
+            notificationService.createNotification(
+                "New booking " + bookingNo + " requested for class '" + yogaClass.getTitle() + "' by " + user.getName(),
+                "BOOKING"
+            );
+        } catch (Exception ex) {
+            System.err.println("In-app notification creation failed: " + ex.getMessage());
+        }
+
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            try {
+                String subject = "FlexiZen Booking Confirmation - " + bookingNo;
+                String body = "Hello " + user.getName() + ",\n\n" +
+                        "Your booking has been requested successfully!\n" +
+                        "Booking Reference: " + bookingNo + "\n" +
+                        "Class Title: " + yogaClass.getTitle() + "\n" +
+                        "Schedule: " + yogaClass.getSchedule() + "\n\n" +
+                        "Our team will review your booking details shortly.\n\n" +
+                        "Warm regards,\nThe FlexiZen Team";
+                emailService.sendEmail(user.getEmail(), subject, body);
+            } catch (Exception ex) {
+                System.err.println("Failed to send booking confirmation email: " + ex.getMessage());
+            }
+        }
+
         return booking;
     }
 
@@ -71,6 +107,33 @@ public class BookingService {
         if (booking != null) {
             booking.setStatus(status);
             bookingRepository.save(booking);
+
+            // Trigger notifications & emails (Future Scope)
+            try {
+                notificationService.createNotification(
+                    "Booking " + booking.getBookingNo() + " status changed to: " + status,
+                    "BOOKING"
+                );
+            } catch (Exception ex) {
+                System.err.println("In-app status update notification failed: " + ex.getMessage());
+            }
+
+            AppUser user = booking.getUser();
+            if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+                try {
+                    String remarkStr = (booking.getRemark() != null && !booking.getRemark().isBlank())
+                            ? "\nAdmin Remark: " + booking.getRemark() : "";
+                    String subject = "FlexiZen Booking " + status + " - " + booking.getBookingNo();
+                    String body = "Hello " + user.getName() + ",\n\n" +
+                            "Your booking (" + booking.getBookingNo() + ") for class '" +
+                            booking.getYogaClass().getTitle() + "' has been " + status + "." +
+                            remarkStr + "\n\n" +
+                            "Warm regards,\nThe FlexiZen Team";
+                    emailService.sendEmail(user.getEmail(), subject, body);
+                } catch (Exception ex) {
+                    System.err.println("Failed to send booking status email update: " + ex.getMessage());
+                }
+            }
         }
         return booking;
     }

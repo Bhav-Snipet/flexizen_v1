@@ -42,4 +42,14 @@ public class EnquiryController {
         enquiryService.deleteEnquiry(id);
         return ResponseEntity.ok(Map.of("deleted", true));
     }
+
+    @PostMapping("/admin/enquiries/{id}/reply")
+    public ResponseEntity<Enquiry> replyToEnquiry(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String replyMessage = payload.get("replyMessage");
+        if (replyMessage == null || replyMessage.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Enquiry updated = enquiryService.replyToEnquiry(id, replyMessage);
+        return ResponseEntity.ok(updated);
+    }
 }

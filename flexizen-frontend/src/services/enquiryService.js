@@ -21,5 +21,10 @@ export const enquiryService = {
     deleteEnquiry: async (id) => {
         const response = await api.delete(`/admin/enquiries/${id}`);
         return response.data;
+    },
+
+    replyEnquiry: async (id, replyMessage) => {
+        const response = await api.post(`/admin/enquiries/${id}/reply`, { replyMessage });
+        return response.data;
     }
 };

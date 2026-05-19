@@ -62,9 +62,19 @@ CREATE TABLE IF NOT EXISTS page_content (
     content   TEXT         NOT NULL
 );
 
+-- ===== NOTIFICATION =====
+CREATE TABLE IF NOT EXISTS notification (
+    id          BIGSERIAL    PRIMARY KEY,
+    message     VARCHAR(255) NOT NULL,
+    read_status BOOLEAN      NOT NULL DEFAULT FALSE,
+    type        VARCHAR(50)  NOT NULL,
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ===== Indexes for common queries =====
-CREATE INDEX IF NOT EXISTS idx_booking_status    ON booking(status);
-CREATE INDEX IF NOT EXISTS idx_booking_no        ON booking(booking_no);
-CREATE INDEX IF NOT EXISTS idx_booking_created   ON booking(created_at);
-CREATE INDEX IF NOT EXISTS idx_enquiry_read      ON enquiry(read_status);
-CREATE INDEX IF NOT EXISTS idx_yoga_class_active ON yoga_class(active);
+CREATE INDEX IF NOT EXISTS idx_booking_status     ON booking(status);
+CREATE INDEX IF NOT EXISTS idx_booking_no         ON booking(booking_no);
+CREATE INDEX IF NOT EXISTS idx_booking_created    ON booking(created_at);
+CREATE INDEX IF NOT EXISTS idx_enquiry_read       ON enquiry(read_status);
+CREATE INDEX IF NOT EXISTS idx_yoga_class_active  ON yoga_class(active);
+CREATE INDEX IF NOT EXISTS idx_notification_read  ON notification(read_status);
