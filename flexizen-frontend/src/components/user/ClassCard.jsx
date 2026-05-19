@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Users, ArrowRight, BadgeCheck, Zap } from 'lucide-react';
+import { Calendar, Users, ArrowRight, BadgeCheck, Zap, MessageSquareMore, Sparkles } from 'lucide-react';
 
 const IMAGE_MAP = {
     'Morning Flow Yoga': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=900',
@@ -15,6 +15,7 @@ const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1506126613408-eca07ce68
 
 const ClassCard = ({ yogaClass, delay = 0 }) => {
     const classImage = yogaClass.image || IMAGE_MAP[yogaClass.title] || DEFAULT_IMAGE;
+    const enquiryLink = `/enquiry/${yogaClass.id}`;
 
     return (
         <article
@@ -27,7 +28,10 @@ const ClassCard = ({ yogaClass, delay = 0 }) => {
                     alt={yogaClass.title}
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(129,140,248,0.22),transparent_30%),radial-gradient(circle_at_85%_15%,rgba(217,70,239,0.16),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(14,165,233,0.12),transparent_32%)] opacity-80 mix-blend-screen animate-glow" />
+                <div className="absolute -left-8 bottom-0 h-20 w-20 rounded-full bg-indigo-500/25 blur-3xl animate-float-y" />
+                <div className="absolute -right-4 top-16 h-16 w-16 rounded-full bg-fuchsia-500/20 blur-2xl animate-float-x" />
                 <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
                     <BadgeCheck className="h-4 w-4 text-emerald-300" />
                     Live Session
@@ -51,7 +55,26 @@ const ClassCard = ({ yogaClass, delay = 0 }) => {
                     </p>
                 </div>
 
-                <div className="mb-6 space-y-3 rounded-3xl border border-white/10 bg-white/5 p-4">
+                <div className="rounded-3xl border border-indigo-400/20 bg-indigo-500/10 p-4 shadow-[0_18px_45px_-28px_rgba(99,102,241,0.55)]">
+                    <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-indigo-100">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Select this session
+                    </p>
+                    <Link
+                        to={enquiryLink}
+                        className="btn-primary w-full shadow-[0_16px_40px_-18px_rgba(99,102,241,0.65)]"
+                        aria-label={`Book now for ${yogaClass.title}`}
+                    >
+                        <MessageSquareMore className="mr-2 h-4 w-4" />
+                        Book Now
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Link>
+                    <p className="mt-3 text-center text-xs leading-6 text-slate-300">
+                        You&apos;ll land on the enquiry form with this session already selected.
+                    </p>
+                </div>
+
+                <div className="mt-6 space-y-3 rounded-3xl border border-white/10 bg-white/5 p-4">
                     <div className="flex items-center gap-3 text-sm text-slate-200">
                         <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-200">
                             <Calendar className="h-4 w-4" />
@@ -65,11 +88,6 @@ const ClassCard = ({ yogaClass, delay = 0 }) => {
                         <span>{yogaClass.capacity} spots available</span>
                     </div>
                 </div>
-
-                <Link to={`/book/${yogaClass.id}`} className="btn-primary mt-auto w-full">
-                    <span>Book Your Place</span>
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </Link>
             </div>
         </article>
     );

@@ -51,8 +51,7 @@
       username-parameter="username"
       password-parameter="password"
       authentication-success-handler-ref="loginSuccessHandler"
-      authentication-failure-handler-ref="loginFailureHandler"
-      permit-all="true"/>
+      authentication-failure-handler-ref="loginFailureHandler"/>
 
     <!-- Logout endpoint -->
     <logout
@@ -64,7 +63,6 @@
     <!-- Unauthorized access: return 401 JSON (not redirect) -->
     <access-denied-handler ref="accessDeniedHandler"/>
 
-    <http-basic disabled="true"/>
 
   </http>
 
@@ -87,5 +85,9 @@
   <!-- ===== Access Denied Handler — returns 403 JSON ===== -->
   <beans:bean id="accessDeniedHandler"
               class="com.flexizen.security.CustomAccessDeniedHandler"/>
+
+  <!-- ===== HandlerMappingIntrospector required by Spring Security 6+ when running in separate context ===== -->
+  <beans:bean id="mvcHandlerMappingIntrospector"
+              class="org.springframework.web.servlet.handler.HandlerMappingIntrospector"/>
 
 </beans:beans>

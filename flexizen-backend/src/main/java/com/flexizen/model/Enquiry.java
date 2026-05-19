@@ -17,6 +17,15 @@ public class Enquiry {
     @Column(nullable = false, length = 100)
     private String email;
 
+    @Column(length = 20)
+    private String phone;
+
+    @Column(name = "session_id")
+    private Long sessionId;
+
+    @Column(name = "session_title", length = 150)
+    private String sessionTitle;
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String message;
 
@@ -36,6 +45,15 @@ public class Enquiry {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public Long getSessionId() { return sessionId; }
+    public void setSessionId(Long sessionId) { this.sessionId = sessionId; }
+
+    public String getSessionTitle() { return sessionTitle; }
+    public void setSessionTitle(String sessionTitle) { this.sessionTitle = sessionTitle; }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }

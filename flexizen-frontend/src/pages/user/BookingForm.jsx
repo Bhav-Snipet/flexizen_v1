@@ -1,9 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import { classService } from '../../services/classService';
-import { bookingService } from '../../services/bookingService';
-import { Calendar, Users, CheckCircle, ShieldCheck, Sparkles, ArrowLeft } from 'lucide-react';
+import { enquiryService } from '../../services/enquiryService';
+import {
+    Calendar,
+    Users,
+    CheckCircle,
+    ShieldCheck,
+    Sparkles,
+    ArrowLeft,
+    ArrowRight,
+    ChevronDown,
+    MessageSquare,
+    Phone,
+    Mail,
+} from 'lucide-react';
 
 const DUMMY_CLASSES = [
     {
@@ -55,12 +67,18 @@ const DUMMY_CLASSES = [
 
 const BookingForm = () => {
     const { classId } = useParams();
-    const [yogaClass, setYogaClass] = useState(null);
+    const [searchParams] = useSearchParams();
+    const queryClassId = searchParams.get('classId') || searchParams.get('sessionId') || '';
+    const initialSelectedId = classId || queryClassId || '';
+
+    const [classes, setClasses] = useState([]);
+    const [selectedClassId, setSelectedClassId] = useState('');
+    const [isSessionMenuOpen, setIsSessionMenuOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [bookingNo, setBookingNo] = useState('');
-    const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
+    const [referenceNo, setReferenceNo] = useState('');
+    const [formData, setFormData] = useState({ name: '', phone: '', email: '', notes: '' });
     const [isDemoMode, setIsDemoMode] = useState(false);
 
     useEffect(() => {
@@ -68,44 +86,90 @@ const BookingForm = () => {
             try {
                 const data = await classService.getActiveClasses();
                 const allClasses = data && data.length > 0 ? data : DUMMY_CLASSES;
-                const foundClass = allClasses.find(c => c.id.toString() === classId);
-                if (foundClass) {
-                    setYogaClass(foundClass);
-                    setIsDemoMode(!data || data.length === 0);
-                }
+                setClasses(allClasses);
+                setIsDemoMode(!data || data.length === 0);
             } catch (error) {
-                console.warn("Failed to load live class details. Using demo class.", error);
-                const foundClass = DUMMY_CLASSES.find(c => c.id.toString() === classId);
-                setYogaClass(foundClass || DUMMY_CLASSES[0]);
+                console.warn('Failed to load live class details. Using demo classes.', error);
+                setClasses(DUMMY_CLASSES);
                 setIsDemoMode(true);
             } finally {
                 setLoading(false);
             }
         };
         loadClassDetails();
-    }, [classId]);
+    }, []);
+
+    const sessionMenuRef = useRef(null);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (sessionMenuRef.current && !sessionMenuRef.current.contains(event.target)) {
+                setIsSessionMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, []);
+
+    const effectiveSelectedClassId = selectedClassId || initialSelectedId;
+
+    const selectedClass = useMemo(
+        () => classes.find((item) => item.id.toString() === effectiveSelectedClassId) || null,
+        [classes, effectiveSelectedClassId]
+    );
+
+    const currentClassImage =
+        selectedClass?.image ||
+        'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1200';
+
+    const hasRouteSelection = Boolean(initialSelectedId);
+
+    const generateReference = (prefix = 'ENQ') => {
+        const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+        const randomId = Math.floor(1000 + Math.random() * 9000);
+        return `${prefix}-${timestamp}${randomId}`;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!effectiveSelectedClassId) {
+            alert('Please choose a session first.');
+            return;
+        }
+
+        if (!selectedClass) {
+            alert('The selected session could not be loaded. Please choose another class.');
+            return;
+        }
+
         setSubmitting(true);
         try {
             const payload = {
-                user: formData,
-                classId: classId
+                name: formData.name,
+                phone: formData.phone,
+                email: formData.email,
+                message: [
+                    `Session: ${selectedClass.title}`,
+                    `Schedule: ${selectedClass.schedule}`,
+                    '',
+                    formData.notes?.trim() ? `Notes: ${formData.notes.trim()}` : 'Notes: -',
+                ] .join('\n'),
+                sessionId: Number(effectiveSelectedClassId),
+                sessionTitle: selectedClass.title,
             };
-            const response = await bookingService.createBooking(payload);
-            setBookingNo(response.bookingNo);
+
+            const response = await enquiryService.submitEnquiry(payload);
+            setReferenceNo(response?.id ? `ENQ-${response.id}` : generateReference());
             setSuccess(true);
         } catch (error) {
             if (!error.response || isDemoMode) {
-                const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
-                const randomId = Math.floor(1000 + Math.random() * 9000);
-                const simulatedBookingNo = `FZ-${timestamp}${randomId}`;
-                setBookingNo(simulatedBookingNo);
+                setReferenceNo(generateReference());
                 setSuccess(true);
             } else {
-                alert("Failed to submit booking. Please try again.");
-                console.error("Booking failed:", error);
+                alert('Failed to submit enquiry. Please try again.');
+                console.error('Enquiry submission failed:', error);
             }
         } finally {
             setSubmitting(false);
@@ -123,16 +187,19 @@ const BookingForm = () => {
         );
     }
 
-    if (!yogaClass) {
+    if (hasRouteSelection && !selectedClass) {
         return (
             <div className="app-shell flex min-h-screen flex-col">
                 <Navbar />
                 <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
                     <p className="muted-kicker">
                         <Sparkles className="h-3.5 w-3.5" />
-                        Class not found
+                        Session not found
                     </p>
                     <h2 className="mt-4 text-3xl font-bold text-white">We could not load this session.</h2>
+                    <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
+                        The selected class is not available right now. Please return to the classes page and choose another session.
+                    </p>
                     <Link to="/classes" className="btn-primary mt-6">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Return to Classes
@@ -153,16 +220,18 @@ const BookingForm = () => {
                         </div>
                         <p className="muted-kicker mx-auto mt-6 w-fit">
                             <ShieldCheck className="h-3.5 w-3.5" />
-                            Booking confirmed
+                            Enquiry received
                         </p>
-                        <h2 className="mt-5 text-3xl font-black tracking-tight text-white">Your spot has been reserved.</h2>
+                        <h2 className="mt-5 text-3xl font-black tracking-tight text-white">Your session enquiry has been submitted.</h2>
                         <p className="mt-3 text-slate-300">
-                            A booking request for <span className="font-semibold text-white">{yogaClass.title}</span> was completed successfully.
+                            A request for <span className="font-semibold text-white">{selectedClass?.title || 'your chosen session'}</span> was completed successfully.
                         </p>
 
                         <div className="animated-border mt-8 rounded-[1.6rem] bg-white/5 p-6">
-                            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Booking number</p>
-                            <p className="mt-3 break-all font-mono text-3xl font-bold tracking-wider text-indigo-200">{bookingNo}</p>
+                            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Reference number</p>
+                            <p className="mt-3 break-all font-mono text-3xl font-bold tracking-wider text-indigo-200">
+                                {referenceNo}
+                            </p>
                         </div>
 
                         {isDemoMode && (
@@ -172,65 +241,141 @@ const BookingForm = () => {
                         )}
 
                         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                            <Link to="/classes" className="btn-primary">
-                                Browse More Classes
+                            <Link to="/classes" className="btn-secondary">
+                                Browse more classes
                             </Link>
-                            <Link to="/" className="btn-secondary">
-                                Back to Home
+                            <Link to="/contact" className="btn-primary">
+                                Contact the studio
                             </Link>
                         </div>
                     </div>
                 ) : (
-                    <div className="grid w-full gap-8 lg:grid-cols-[0.92fr_1.08fr]">
-                        <aside className="surface overflow-hidden">
-                            <div className="relative h-64 overflow-hidden">
+                    <div className="grid w-full gap-8 xl:grid-cols-[1.05fr_0.95fr]">
+                        <aside className="surface overflow-hidden p-6 sm:p-8">
+                            <p className="muted-kicker">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                Selected session
+                            </p>
+                            <div className="mt-5 overflow-hidden rounded-[1.6rem] border border-white/10">
                                 <img
-                                    src={yogaClass.image || 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1200'}
-                                    alt={yogaClass.title}
-                                    className="h-full w-full object-cover"
+                                    src={currentClassImage}
+                                    alt={selectedClass?.title || 'Yoga session preview'}
+                                    className="h-72 w-full object-cover"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                                <div className="absolute left-4 top-4 muted-kicker">
-                                    <Sparkles className="h-3.5 w-3.5" />
-                                    Session preview
-                                </div>
                             </div>
-                            <div className="p-6">
-                                <h3 className="text-3xl font-bold tracking-tight text-white">{yogaClass.title}</h3>
-                                <p className="mt-4 text-sm leading-7 text-slate-300">{yogaClass.description}</p>
 
-                                <div className="mt-6 space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5">
-                                    <div className="flex items-center gap-3 text-sm text-slate-200">
-                                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-200">
-                                            <Calendar className="h-4 w-4" />
-                                        </span>
-                                        <span>{yogaClass.schedule}</span>
+                            <div className="mt-6">
+                                <h2 className="text-3xl font-bold tracking-tight text-white">
+                                    {selectedClass?.title || 'Choose a session to continue'}
+                                </h2>
+                                <p className="mt-3 text-sm leading-7 text-slate-300">
+                                    {selectedClass?.description ||
+                                        'Use the dropdown on the right to choose the session you want to enquire about or book.'}
+                                </p>
+
+                                {selectedClass ? (
+                                    <div className="mt-6 space-y-3 rounded-3xl border border-white/10 bg-white/5 p-5">
+                                        <div className="flex items-center gap-3 text-sm text-slate-200">
+                                            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-200">
+                                                <Calendar className="h-4 w-4" />
+                                            </span>
+                                            <span>{selectedClass.schedule}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-sm text-slate-200">
+                                            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-500/15 text-violet-200">
+                                                <Users className="h-4 w-4" />
+                                            </span>
+                                            <span>{selectedClass.capacity} spots available</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-3 text-sm text-slate-200">
-                                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-500/15 text-violet-200">
-                                            <Users className="h-4 w-4" />
-                                        </span>
-                                        <span>{yogaClass.capacity} spots available</span>
+                                ) : (
+                                    <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300">
+                                        Select a class from the dropdown to see the schedule, capacity, and session preview here.
                                     </div>
+                                )}
+
+                                <div className="mt-6 rounded-3xl border border-indigo-400/15 bg-indigo-500/10 p-5">
+                                    <p className="text-xs uppercase tracking-[0.22em] text-indigo-200">How it works</p>
+                                    <p className="mt-3 text-sm leading-7 text-slate-200">
+                                        Choose your session, fill in your details, and send the request. The studio team can then review it from the admin panel.
+                                    </p>
                                 </div>
 
-                                <p className="mt-6 text-sm text-slate-400">
-                                    No account required. Booking number is generated instantly after confirmation.
-                                </p>
+                                {isDemoMode && (
+                                    <p className="mt-5 rounded-full border border-amber-400/20 bg-amber-500/10 px-4 py-2 text-xs font-medium text-amber-200">
+                                        Demo classes are currently being shown because the backend returned no sessions.
+                                    </p>
+                                )}
                             </div>
                         </aside>
 
                         <section className="surface p-6 sm:p-8">
                             <p className="muted-kicker">
                                 <ShieldCheck className="h-3.5 w-3.5" />
-                                Reserve your spot
+                                Enquiry form
                             </p>
-                            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white">Booking details</h2>
+                            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white">Select your session</h2>
                             <p className="mt-2 text-sm leading-7 text-slate-300">
-                                Fill in a few details to hold your place in this session.
+                                If you arrived from a class card, that session is already preselected. Otherwise, choose one from the dropdown below.
                             </p>
 
                             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                                <div ref={sessionMenuRef}>
+                                    <label className="label-soft">Session *</label>
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsSessionMenuOpen((open) => !open)}
+                                            className="input-surface flex items-center justify-between gap-3 text-left"
+                                            aria-haspopup="listbox"
+                                            aria-expanded={isSessionMenuOpen}
+                                        >
+                                            <span className="min-w-0 flex-1">
+                                                <span className="block text-sm font-medium text-white">
+                                                    {selectedClass ? selectedClass.title : 'Choose a session'}
+                                                </span>
+                                                <span className="mt-1 block truncate text-xs text-slate-400">
+                                                    {selectedClass ? selectedClass.schedule : 'Select a live class from the menu below'}
+                                                </span>
+                                            </span>
+                                            <ChevronDown className={`h-4 w-4 flex-shrink-0 text-slate-300 transition-transform duration-300 ${isSessionMenuOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {isSessionMenuOpen && (
+                                            <div className="absolute z-20 mt-3 w-full overflow-hidden rounded-[1.35rem] border border-white/10 bg-slate-950/98 p-2 shadow-[0_24px_70px_-20px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+                                                <div className="max-h-72 overflow-y-auto pr-1 scrollbar-thin" role="listbox" aria-label="Available sessions">
+                                                    {classes.map((item) => {
+                                                        const active = item.id.toString() === effectiveSelectedClassId;
+                                                        return (
+                                                            <button
+                                                                key={item.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setSelectedClassId(item.id.toString());
+                                                                    setIsSessionMenuOpen(false);
+                                                                }}
+                                                                className={`mb-2 w-full rounded-2xl border px-4 py-3 text-left transition-all duration-200 last:mb-0 ${active
+                                                                    ? 'border-indigo-400/40 bg-indigo-500/20 text-white shadow-lg shadow-indigo-500/10'
+                                                                    : 'border-white/10 bg-white/5 text-slate-200 hover:border-indigo-400/25 hover:bg-white/10 hover:text-white'
+                                                                }`}
+                                                                role="option"
+                                                                aria-selected={active}
+                                                            >
+                                                                <span className="block text-sm font-semibold">{item.title}</span>
+                                                                <span className="mt-1 block text-xs leading-6 text-slate-400">{item.schedule}</span>
+                                                                <span className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 px-2.5 py-1 text-[11px] font-medium text-slate-300">
+                                                                    <Users className="h-3 w-3" />
+                                                                    {item.capacity} seats available
+                                                                </span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="label-soft">Full Name *</label>
                                     <input
@@ -239,9 +384,10 @@ const BookingForm = () => {
                                         className="input-surface"
                                         placeholder="John Doe"
                                         value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     />
                                 </div>
+
                                 <div>
                                     <label className="label-soft">Phone Number *</label>
                                     <input
@@ -250,17 +396,29 @@ const BookingForm = () => {
                                         className="input-surface"
                                         placeholder="+91 98765 43210"
                                         value={formData.phone}
-                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     />
                                 </div>
+
                                 <div>
                                     <label className="label-soft">Email Address</label>
                                     <input
                                         type="email"
                                         className="input-surface"
-                                        placeholder="john@example.com (optional)"
+                                        placeholder="john@example.com"
                                         value={formData.email}
-                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="label-soft">Message / Questions</label>
+                                    <textarea
+                                        rows="4"
+                                        className="input-surface resize-none"
+                                        placeholder="Anything you want the studio team to know..."
+                                        value={formData.notes}
+                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                     />
                                 </div>
 
@@ -269,9 +427,31 @@ const BookingForm = () => {
                                     disabled={submitting}
                                     className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-70"
                                 >
-                                    {submitting ? 'Processing...' : 'Confirm Booking'}
+                                    <span>{submitting ? 'Submitting...' : 'Submit Enquiry'}</span>
+                                    <ArrowRight className="ml-2 h-4 w-4" />
                                 </button>
                             </form>
+
+                            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-4 text-sm leading-7 text-slate-300">
+                                Need to go back?{' '}
+                                <Link to="/classes" className="font-semibold text-indigo-200 hover:text-white">
+                                    Browse all sessions
+                                </Link>
+                                .
+                            </div>
+
+                            <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                                <MessageSquare className="h-4 w-4 text-indigo-300" />
+                                <span>Your request appears in the admin enquiry workflow.</span>
+                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300">
+                                    <Phone className="h-3.5 w-3.5" />
+                                    Phone included
+                                </span>
+                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300">
+                                    <Mail className="h-3.5 w-3.5" />
+                                    Email included
+                                </span>
+                            </div>
                         </section>
                     </div>
                 )}

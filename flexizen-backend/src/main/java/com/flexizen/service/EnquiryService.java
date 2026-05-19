@@ -27,8 +27,11 @@ public class EnquiryService {
 
         // Trigger in-app notification (Future Scope)
         try {
+            String sessionPart = (enquiry.getSessionTitle() != null && !enquiry.getSessionTitle().isBlank())
+                    ? " for session '" + enquiry.getSessionTitle() + "'"
+                    : "";
             notificationService.createNotification(
-                "New enquiry received from " + enquiry.getName() + " (" + enquiry.getEmail() + ")",
+                "New enquiry received from " + enquiry.getName() + " (" + enquiry.getEmail() + ")" + sessionPart,
                 "ENQUIRY"
             );
         } catch (Exception ex) {

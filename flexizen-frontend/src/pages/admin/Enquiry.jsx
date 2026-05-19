@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import AdminHeader from '../../components/admin/AdminHeader';
 import { enquiryService } from '../../services/enquiryService';
-import { CheckCircle2, Trash2, Mail, MailOpen, CornerUpLeft, X } from 'lucide-react';
+import { CheckCircle2, Trash2, Mail, MailOpen, CornerUpLeft, X, Phone, CalendarDays } from 'lucide-react';
 
 const Enquiry = () => {
     const [enquiries, setEnquiries] = useState([]);
@@ -113,6 +113,22 @@ const Enquiry = () => {
                                                         {enquiry.name}
                                                     </h3>
                                                     <a href={`mailto:${enquiry.email}`} className="text-sm text-indigo-600 hover:underline">{enquiry.email}</a>
+                                                    {(enquiry.phone || enquiry.sessionTitle) && (
+                                                        <div className="mt-2 flex flex-wrap gap-2">
+                                                            {enquiry.phone && (
+                                                                <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                                                                    <Phone size={12} />
+                                                                    {enquiry.phone}
+                                                                </span>
+                                                            )}
+                                                            {enquiry.sessionTitle && (
+                                                                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
+                                                                    <CalendarDays size={12} />
+                                                                    {enquiry.sessionTitle}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex flex-col items-end space-y-3">
@@ -135,9 +151,12 @@ const Enquiry = () => {
                                             </div>
                                         </div>
                                         <div className="pl-14">
-                                            <p className={`text-gray-700 leading-relaxed text-sm whitespace-pre-wrap ${!enquiry.readStatus ? 'font-medium text-gray-900' : ''}`}>
-                                                {enquiry.message}
-                                            </p>
+                                            <div className="rounded-2xl border border-gray-100 bg-gray-50/80 p-4">
+                                                <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Session request</p>
+                                                <p className={`mt-2 text-gray-700 leading-relaxed text-sm whitespace-pre-wrap ${!enquiry.readStatus ? 'font-medium text-gray-900' : ''}`}>
+                                                    {enquiry.message}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

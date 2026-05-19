@@ -47,12 +47,15 @@ CREATE TABLE IF NOT EXISTS booking (
 
 -- ===== ENQUIRY =====
 CREATE TABLE IF NOT EXISTS enquiry (
-    id          BIGSERIAL    PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL,
-    email       VARCHAR(100) NOT NULL,
-    message     TEXT         NOT NULL,
-    read_status BOOLEAN      NOT NULL DEFAULT FALSE,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id            BIGSERIAL    PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    email         VARCHAR(100) NOT NULL,
+    phone         VARCHAR(20),
+    session_id    BIGINT,
+    session_title VARCHAR(150),
+    message       TEXT         NOT NULL,
+    read_status   BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ===== PAGE CONTENT (CMS — About Us / Contact Us) =====

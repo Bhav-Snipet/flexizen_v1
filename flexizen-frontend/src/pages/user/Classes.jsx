@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import ClassCard from '../../components/user/ClassCard';
 import { classService } from '../../services/classService';
@@ -164,6 +165,16 @@ const Classes = () => {
                                     );
                                 })}
                             </div>
+                        </div>
+
+                        <div className="mt-6 surface flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-white">Need help choosing the right session?</p>
+                                <p className="mt-1 text-sm text-slate-400">Open the enquiry form and pick from all live classes in one place.</p>
+                            </div>
+                            <Link to="/enquiry" className="btn-secondary w-full sm:w-auto">
+                                Open enquiry form
+                            </Link>
                         </div>
                     </div>
                 </section>

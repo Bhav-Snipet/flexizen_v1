@@ -22,10 +22,13 @@ function App() {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/classes" element={<Classes />} />
+      <Route path="/book" element={<BookingForm />} />
       <Route path="/book/:classId" element={<BookingForm />} />
+      <Route path="/enquiry" element={<BookingForm />} />
+      <Route path="/enquiry/:classId" element={<BookingForm />} />
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<ContactUs />} />
-      
+
       {/* Auth */}
       <Route path="/login" element={<Login />} />
 
