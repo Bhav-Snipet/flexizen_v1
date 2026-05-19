@@ -1,81 +1,77 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Users, ArrowRight } from 'lucide-react';
+import { Calendar, Users, ArrowRight, BadgeCheck, Zap } from 'lucide-react';
 
 const IMAGE_MAP = {
-    'Morning Flow Yoga': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600',
-    'Power Vinyasa': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600',
-    'Yin Yoga & Deep Meditation': 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=600',
-    'Yin Yoga & Meditation': 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=600',
-    'Beginner Hatha Yoga': 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=600',
-    'Advanced Ashtanga Series': 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=600',
-    'Advanced Ashtanga': 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=600',
+    'Morning Flow Yoga': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=900',
+    'Power Vinyasa': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=900',
+    'Yin Yoga & Deep Meditation': 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=900',
+    'Yin Yoga & Meditation': 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=900',
+    'Beginner Hatha Yoga': 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=900',
+    'Advanced Ashtanga Series': 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=900',
+    'Advanced Ashtanga': 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=900',
 };
 
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600';
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=900';
 
 const ClassCard = ({ yogaClass, delay = 0 }) => {
-    // Determine the image to display
     const classImage = yogaClass.image || IMAGE_MAP[yogaClass.title] || DEFAULT_IMAGE;
 
     return (
-        <div 
-            className="bg-white rounded-3xl shadow-sm hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col group animate-in fade-in slide-in-from-bottom-6 fill-mode-both"
+        <article
+            className="group overflow-hidden rounded-[1.9rem] border border-white/10 bg-white/5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400/30 hover:shadow-[0_28px_80px_-30px_rgba(15,23,42,0.8)]"
             style={{ animationDelay: `${delay}ms` }}
         >
-            {/* Class Image Container */}
-            <div className="h-56 overflow-hidden relative">
-                <div className="absolute inset-0 bg-slate-900/10 z-10 transition-opacity group-hover:bg-slate-900/0"></div>
-                <img 
-                    src={classImage} 
-                    alt={yogaClass.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-105" 
+            <div className="relative h-64 overflow-hidden">
+                <img
+                    src={classImage}
+                    alt={yogaClass.title}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                 />
-                
-                {/* Visual badge for dynamic class */}
-                <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-indigo-700 shadow-sm">
-                    Active Session
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                    <BadgeCheck className="h-4 w-4 text-emerald-300" />
+                    Live Session
+                </div>
+                <div className="absolute right-4 top-4 rounded-full bg-slate-950/60 px-3 py-1 text-xs font-semibold text-slate-100 backdrop-blur-md">
+                    {yogaClass.capacity} seats
                 </div>
             </div>
-            
-            {/* Details and Description */}
-            <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors duration-200">
+
+            <div className="flex h-full flex-col p-6">
+                <div className="mb-5">
+                    <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-indigo-200">
+                        <Zap className="h-4 w-4" />
+                        FlexiZen Studio
+                    </div>
+                    <h3 className="text-2xl font-bold tracking-tight text-white transition group-hover:text-indigo-200">
                         {yogaClass.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-6 leading-relaxed line-clamp-3">
+                    <p className="mt-3 text-sm leading-7 text-slate-300">
                         {yogaClass.description}
                     </p>
                 </div>
-                
-                <div>
-                    {/* Details Rows */}
-                    <div className="space-y-3 mb-6 text-sm text-gray-500 font-semibold border-t border-gray-50 pt-4">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
-                                <Calendar size={16} />
-                            </div>
-                            <span className="text-gray-700">{yogaClass.schedule}</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
-                                <Users size={16} />
-                            </div>
-                            <span className="text-gray-700">{yogaClass.capacity} Spots Available</span>
-                        </div>
+
+                <div className="mb-6 space-y-3 rounded-3xl border border-white/10 bg-white/5 p-4">
+                    <div className="flex items-center gap-3 text-sm text-slate-200">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-200">
+                            <Calendar className="h-4 w-4" />
+                        </span>
+                        <span>{yogaClass.schedule}</span>
                     </div>
-                    
-                    {/* Call to action button */}
-                    <Link 
-                        to={`/book/${yogaClass.id}`}
-                        className="w-full py-3.5 bg-slate-950 text-white font-bold rounded-2xl hover:bg-indigo-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-sm hover:shadow-md"
-                    >
-                        <span>Book Session</span>
-                        <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
+                    <div className="flex items-center gap-3 text-sm text-slate-200">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-violet-500/15 text-violet-200">
+                            <Users className="h-4 w-4" />
+                        </span>
+                        <span>{yogaClass.capacity} spots available</span>
+                    </div>
                 </div>
+
+                <Link to={`/book/${yogaClass.id}`} className="btn-primary mt-auto w-full">
+                    <span>Book Your Place</span>
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
             </div>
-        </div>
+        </article>
     );
 };
 

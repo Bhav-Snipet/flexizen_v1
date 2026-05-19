@@ -1,110 +1,189 @@
 import Navbar from '../../components/common/Navbar';
 import { Link } from 'react-router-dom';
-import { Sparkles, ShieldCheck, Heart, ArrowRight } from 'lucide-react';
+import { Sparkles, ShieldCheck, Heart, ArrowRight, CalendarDays, BadgeCheck, TimerReset, Star, PlayCircle } from 'lucide-react';
+
+const highlights = [
+    { label: 'Expert coaches', value: '15+' },
+    { label: 'Monthly sessions', value: '120+' },
+    { label: 'Flexible schedules', value: '7 days' },
+];
+
+const benefits = [
+    {
+        icon: ShieldCheck,
+        title: 'Calm, secure booking',
+        text: 'A simple booking flow with instant confirmation and clear class details.',
+    },
+    {
+        icon: Heart,
+        title: 'Welcoming for all levels',
+        text: 'Beginner-friendly sessions, mindful pacing, and a studio atmosphere built for everyone.',
+    },
+    {
+        icon: BadgeCheck,
+        title: 'Professional class management',
+        text: 'Admin-controlled class updates, enquiries, reports, and content in one system.',
+    },
+];
+
+const classCards = [
+    {
+        title: 'Morning Flow Yoga',
+        schedule: 'Mon / Wed / Fri — 7:00 AM',
+        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200',
+    },
+    {
+        title: 'Power Vinyasa',
+        schedule: 'Tue / Thu — 6:30 PM',
+        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1200',
+    },
+    {
+        title: 'Yin Meditation',
+        schedule: 'Weekend — Deep Reset',
+        image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=1200',
+    },
+];
 
 const Home = () => {
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans overflow-x-hidden">
+        <div className="app-shell flex min-h-screen flex-col">
             <Navbar />
-            
-            {/* Hero Section */}
-            <main className="flex-1 flex flex-col">
-                <div className="relative bg-gradient-to-r from-slate-900 to-indigo-950 text-white py-24 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden flex items-center min-h-[75vh]">
-                    {/* Background Graphic overlay */}
-                    <div className="absolute inset-0 opacity-20 mix-blend-overlay">
-                        <img 
-                            src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1920" 
-                            alt="Yoga background" 
-                            className="w-full h-full object-cover scale-105 filter blur-[2px]"
+
+            <main className="flex-1">
+                <section className="relative overflow-hidden">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=2400"
+                            alt="Yoga studio background"
+                            className="h-full w-full object-cover opacity-20"
                         />
-                    </div>
-                    {/* Subtle warm ambient glow lights */}
-                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                    <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse delay-700"></div>
-
-                    <div className="relative max-w-5xl mx-auto text-center z-10 space-y-8">
-                        <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-indigo-300 text-sm font-semibold tracking-wide uppercase animate-bounce">
-                            <Sparkles size={16} />
-                            <span>Discover Your Path to Harmony</span>
-                        </div>
-                        
-                        <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-none text-white drop-shadow-sm">
-                            Find Your Inner{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
-                                Peace & Strength
-                            </span>
-                        </h1>
-                        
-                        <p className="text-lg sm:text-xl md:text-2xl text-slate-200 max-w-3xl mx-auto leading-relaxed drop-shadow">
-                            Join our expert-led yoga sessions designed to restore balance, build flexibility, and harmonize your entire mind, body, and spirit.
-                        </p>
-                        
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
-                            <Link 
-                                to="/classes" 
-                                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-900 bg-white hover:bg-indigo-50 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto"
-                            >
-                                <span>Explore Classes</span>
-                                <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                            <Link 
-                                to="/about" 
-                                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white border-2 border-white/40 hover:border-white hover:bg-white/10 rounded-full transition-all duration-300 w-full sm:w-auto"
-                            >
-                                Learn More
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Features / Benefits Grid */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Why Choose FlexiZen?</h2>
-                        <div className="w-16 h-1 bg-indigo-600 mx-auto mt-4 rounded-full"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/90 to-indigo-950/95" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
-                            <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-                                <Heart size={28} />
+                    <div className="hero-orb left-10 top-16 h-48 w-48 bg-indigo-500/25 animate-float-y" />
+                    <div className="hero-orb right-10 top-28 h-64 w-64 bg-violet-500/20 animate-float-x" />
+                    <div className="hero-orb bottom-0 left-1/3 h-64 w-64 bg-cyan-500/15 animate-glow" />
+
+                    <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8 lg:py-24">
+                        <div className="animate-fade-up">
+                            <div className="muted-kicker">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                FlexiZen Yoga Studio
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Holistic Wellness</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Our classes combine breathwork, postures, and active mindfulness to promote physical stability and mental tranquility.
+
+                            <h1 className="mt-6 max-w-4xl text-5xl font-black tracking-tight text-white md:text-7xl">
+                                Find your rhythm.
+                                <span className="mt-2 block bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
+                                    Move with purpose.
+                                </span>
+                            </h1>
+
+                            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 md:text-xl">
+                                A premium yoga registration and scheduling experience built to feel calm, modern, and effortless — from browsing classes to booking a spot in seconds.
+                            </p>
+
+                            <div className="mt-8 flex flex-wrap gap-4">
+                                <Link to="/classes" className="btn-primary">
+                                    Explore Classes
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                                <Link to="/contact" className="btn-secondary">
+                                    <PlayCircle className="mr-2 h-4 w-4" />
+                                    Contact Studio
+                                </Link>
+                            </div>
+
+                            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                                {highlights.map((item) => (
+                                    <div key={item.label} className="glass rounded-3xl p-5">
+                                        <div className="text-3xl font-black text-white">{item.value}</div>
+                                        <div className="mt-2 text-sm text-slate-300">{item.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="relative animate-fade-up lg:pt-8">
+                            <div className="surface animated-border overflow-hidden p-4">
+                                <div className="panel-grid rounded-[1.5rem] p-4">
+                                    <div className="overflow-hidden rounded-[1.5rem]">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1600"
+                                            alt="Yoga practice"
+                                            className="h-[420px] w-full object-cover transition duration-700 hover:scale-105"
+                                        />
+                                    </div>
+
+                                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                        <div className="rounded-3xl border border-white/10 bg-slate-950/65 p-4">
+                                            <CalendarDays className="h-5 w-5 text-indigo-300" />
+                                            <p className="mt-3 text-sm font-semibold text-white">Flexible weekly schedules</p>
+                                            <p className="mt-1 text-sm text-slate-300">Morning, evening, and restorative sessions.</p>
+                                        </div>
+                                        <div className="rounded-3xl border border-white/10 bg-slate-950/65 p-4">
+                                            <TimerReset className="h-5 w-5 text-violet-300" />
+                                            <p className="mt-3 text-sm font-semibold text-white">Quick booking flow</p>
+                                            <p className="mt-1 text-sm text-slate-300">No account needed for guests.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                    <div className="grid gap-6 md:grid-cols-3">
+                        {benefits.map((item) => {
+                            const Icon = item.icon;
+                            return (
+                                <div key={item.title} className="surface card-hover p-6">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-indigo-200">
+                                        <Icon className="h-5 w-5" />
+                                    </div>
+                                    <h3 className="mt-5 text-xl font-bold text-white">{item.title}</h3>
+                                    <p className="mt-3 text-sm leading-7 text-slate-300">{item.text}</p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                    <div className="mb-10 flex items-end justify-between gap-4">
+                        <div>
+                            <div className="muted-kicker">
+                                <Star className="h-3.5 w-3.5" />
+                                Featured classes
+                            </div>
+                            <h2 className="section-title mt-4">A few sessions from the studio</h2>
+                            <p className="section-subtitle">
+                                Designed to feel premium and inviting, with visual emphasis on calm, movement, and clarity.
                             </p>
                         </div>
-
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
-                            <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
-                                <ShieldCheck size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Expert Guidance</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Practice with certified, passionate yoga instructors who personalize alignments to match all flexible levels.
-                            </p>
-                        </div>
-
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
-                            <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-pink-600 group-hover:text-white transition-colors duration-300">
-                                <Sparkles size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Flexible Scheduling</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Book your favorite morning or evening flow session instantly with no upfront mandatory profiles or complicated signups.
-                            </p>
-                        </div>
+                        <Link to="/classes" className="hidden text-sm font-semibold text-indigo-200 hover:text-white md:inline-flex">
+                            View all classes
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
                     </div>
-                </div>
+
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        {classCards.map((item) => (
+                            <div key={item.title} className="surface card-hover overflow-hidden">
+                                <div className="relative h-64 overflow-hidden">
+                                    <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-700 hover:scale-110" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
+                                </div>
+                                <div className="p-6">
+                                    <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Signature session</p>
+                                    <h3 className="mt-2 text-2xl font-bold text-white">{item.title}</h3>
+                                    <p className="mt-3 text-sm text-slate-300">{item.schedule}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
             </main>
-
-            {/* Premium Footer */}
-            <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-                <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
-                    <h2 className="text-2xl font-bold text-indigo-400">FlexiZen</h2>
-                    <p className="text-sm">© 2026 FlexiZen Yoga Studio. All rights reserved.</p>
-                </div>
-            </footer>
         </div>
     );
 };

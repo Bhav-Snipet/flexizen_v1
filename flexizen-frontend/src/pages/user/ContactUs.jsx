@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../../components/common/Navbar';
 import { pageService } from '../../services/pageService';
 import { enquiryService } from '../../services/enquiryService';
-import { Mail, Phone, MapPin, CheckCircle, Sparkles } from 'lucide-react';
+import { Mail, Phone, MapPin, CheckCircle, Sparkles, Send, Clock3, Globe } from 'lucide-react';
 
 const DEFAULT_CONTACT_CONTENT = `
 <h2>Find Us at Our Sanctuary</h2>
@@ -12,11 +12,17 @@ const DEFAULT_CONTACT_CONTENT = `
 <p>Feel free to drop in for a peaceful trial class or message us with any questions. We look forward to meeting you!</p>
 `;
 
+const contacts = [
+    { icon: Phone, label: 'Phone', value: '+91 98765 43210' },
+    { icon: Mail, label: 'Email', value: 'hello@flexizen.com' },
+    { icon: MapPin, label: 'Location', value: 'Koregaon Park, Pune' },
+    { icon: Clock3, label: 'Hours', value: 'Mon–Sat 6 AM–8 PM' },
+];
+
 const ContactUs = () => {
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
-    
-    // Form state
+
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -52,7 +58,6 @@ const ContactUs = () => {
             setFormData({ name: '', email: '', message: '' });
         } catch (error) {
             if (!error.response || isDemoMode) {
-                // Simulate a successful submission if the backend is down
                 setSuccess(true);
                 setFormData({ name: '', email: '', message: '' });
             } else {
@@ -64,128 +69,151 @@ const ContactUs = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+        <div className="app-shell flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="text-center mb-16">
-                    <span className="text-xs uppercase bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-bold tracking-wider">Connect With Us</span>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mt-3">Get in Touch</h1>
-                    <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto leading-relaxed">
-                        Have a question about our classes, active schedules, or want to learn more? We would love to hear from you.
-                    </p>
-                </div>
-
-                <div className="flex flex-col lg:flex-row gap-12 items-stretch">
-                    {/* Contact Info (CMS) */}
-                    <div className="lg:w-5/12 flex">
-                        <div className="bg-indigo-950 text-white rounded-3xl p-8 md:p-10 shadow-xl h-full flex flex-col justify-between w-full relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-600/10 rounded-full blur-2xl"></div>
-                            
-                            <div>
-                                <h2 className="text-2xl font-bold mb-8 flex items-center space-x-2">
-                                    <Sparkles size={20} className="text-indigo-400" />
-                                    <span>Contact Information</span>
-                                </h2>
-                                
-                                {loading ? (
-                                    <div className="flex justify-center py-10">
-                                        <span className="w-8 h-8 border-4 border-indigo-400 border-t-white rounded-full animate-spin"></span>
-                                    </div>
-                                ) : (
-                                    <div 
-                                        className="prose prose-invert text-indigo-100/90 flex-1 leading-relaxed space-y-4 text-sm"
-                                        dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }}
-                                    />
-                                )}
-                            </div>
-                            
-                            <div className="space-y-5 mt-10 pt-8 border-t border-indigo-900/60">
-                                <div className="flex items-center space-x-4">
-                                    <div className="p-2.5 bg-indigo-900/40 text-indigo-300 rounded-xl">
-                                        <Mail className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-indigo-400 uppercase font-semibold">Email Us</p>
-                                        <p className="text-sm font-semibold text-white">hello@flexizen.com</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-4">
-                                    <div className="p-2.5 bg-indigo-900/40 text-indigo-300 rounded-xl">
-                                        <Phone className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-indigo-400 uppercase font-semibold">Call Us</p>
-                                        <p className="text-sm font-semibold text-white">+91 98765 43210</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-4">
-                                    <div className="p-2.5 bg-indigo-900/40 text-indigo-300 rounded-xl">
-                                        <MapPin className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-indigo-400 uppercase font-semibold">Visit Us</p>
-                                        <p className="text-sm font-semibold text-white text-wrap">Koregaon Park, Pune, Maharashtra</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <main className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+                <section className="surface relative overflow-hidden p-8 sm:p-10 lg:p-12">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=2200"
+                            alt="Contact studio"
+                            className="h-full w-full object-cover opacity-10"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/88 to-violet-950/80" />
                     </div>
 
-                    {/* Enquiry Form */}
-                    <div className="lg:w-7/12 flex">
-                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 w-full flex flex-col justify-center">
-                            <h3 className="text-2xl font-bold text-gray-900 mb-8">Send us a Message</h3>
-                            
-                            {success ? (
-                                <div className="bg-green-50 border border-green-100 rounded-2xl p-8 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="flex justify-center mb-4">
-                                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                                            <CheckCircle className="w-8 h-8 text-green-600" />
+                    <div className="relative grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
+                        <div>
+                            <div className="muted-kicker">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                Contact FlexiZen
+                            </div>
+                            <h1 className="mt-5 text-4xl font-black tracking-tight text-white md:text-6xl">
+                                Say hello.
+                                <span className="mt-2 block bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">
+                                    We respond with care.
+                                </span>
+                            </h1>
+                            <p className="mt-5 max-w-xl text-base leading-8 text-slate-300">
+                                Reach out with questions, suggestions, or a simple hello. The contact page feels like a premium studio landing page, with contact details and enquiry support in one place.
+                            </p>
+
+                            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                                {contacts.map((contact) => {
+                                    const Icon = contact.icon;
+                                    return (
+                                        <div key={contact.label} className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+                                            <Icon className="h-5 w-5 text-indigo-200" />
+                                            <p className="mt-3 text-xs uppercase tracking-[0.22em] text-slate-400">{contact.label}</p>
+                                            <p className="mt-2 text-sm font-semibold text-white">{contact.value}</p>
                                         </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="surface animated-border p-6 sm:p-8">
+                            {success ? (
+                                <div className="flex h-full flex-col items-center justify-center py-10 text-center">
+                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+                                        <CheckCircle className="h-10 w-10" />
                                     </div>
-                                    <h4 className="text-xl font-bold text-green-900 mb-2">Message Sent!</h4>
-                                    <p className="text-green-700">Thank you for reaching out. We will get back to you shortly.</p>
-                                    {isDemoMode && (
-                                        <p className="text-xs text-yellow-600 font-medium bg-yellow-50 px-3 py-1 rounded-full mt-3 inline-block border border-yellow-100">
-                                            Showcase Demo Simulation success
-                                        </p>
-                                    )}
-                                    <div className="mt-6">
-                                        <button 
-                                            onClick={() => setSuccess(false)}
-                                            className="px-6 py-2.5 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-colors"
-                                        >
-                                            Send Another Message
-                                        </button>
-                                    </div>
+                                    <h2 className="mt-6 text-3xl font-bold text-white">Message sent!</h2>
+                                    <p className="mt-3 max-w-md text-sm leading-7 text-slate-300">
+                                        Thanks for reaching out. The admin inbox has received your enquiry.
+                                    </p>
+                                    <button type="button" onClick={() => setSuccess(false)} className="btn-secondary mt-8">
+                                        Send another message
+                                    </button>
                                 </div>
                             ) : (
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Your Name *</label>
-                                            <input type="text" required className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                                placeholder="Jane Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                <>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-indigo-200">
+                                            <Send className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
-                                            <input type="email" required className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                                placeholder="jane@example.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                                            <h2 className="text-2xl font-bold text-white">Send an enquiry</h2>
+                                            <p className="text-sm text-slate-400">A direct line to the studio team.</p>
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
-                                        <textarea required rows="5" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
-                                            placeholder="How can we help you?" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}></textarea>
-                                    </div>
-                                    <button type="submit" disabled={submitting} className="w-full py-4 bg-slate-950 text-white font-bold rounded-2xl hover:bg-indigo-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-                                        {submitting ? 'Sending Message...' : 'Send Message'}
-                                    </button>
-                                </form>
+
+                                    <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                                        <div>
+                                            <label className="label-soft">Your Name</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="input-surface"
+                                                value={formData.name}
+                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                placeholder="Your full name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label-soft">Email Address</label>
+                                            <input
+                                                type="email"
+                                                required
+                                                className="input-surface"
+                                                value={formData.email}
+                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                placeholder="you@example.com"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="label-soft">Message</label>
+                                            <textarea
+                                                required
+                                                rows="5"
+                                                className="input-surface resize-none"
+                                                value={formData.message}
+                                                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                                placeholder="Tell us what you need help with..."
+                                            />
+                                        </div>
+
+                                        <button type="submit" disabled={submitting} className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-70">
+                                            {submitting ? 'Sending...' : 'Submit Enquiry'}
+                                        </button>
+                                    </form>
+                                </>
                             )}
                         </div>
                     </div>
-                </div>
+                </section>
+
+                <section className="mt-10 surface overflow-hidden">
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <span className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-indigo-400" />
+                        </div>
+                    ) : (
+                        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+                            <div className="p-8">
+                                <div
+                                    className="prose prose-invert max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: content }}
+                                />
+                            </div>
+                            <div className="border-t border-white/10 p-8 lg:border-l lg:border-t-0">
+                                <div className="rounded-[1.6rem] border border-white/10 bg-slate-950/60 p-6">
+                                    <div className="flex items-center gap-3 text-indigo-200">
+                                        <Globe className="h-5 w-5" />
+                                        <span className="text-xs font-semibold uppercase tracking-[0.24em]">Studio presence</span>
+                                    </div>
+                                    <div className="mt-5 h-72 overflow-hidden rounded-[1.35rem]">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1600"
+                                            alt="Yoga studio interior"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </section>
             </main>
         </div>
     );

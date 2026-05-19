@@ -1,50 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const StatCard = ({ title, value, icon: Icon, colorClass, gradientClass, delay = 0 }) => {
     const [animatedValue, setAnimatedValue] = useState(0);
 
-    // Simple number count-up animation
     useEffect(() => {
-        let start = 0;
-        const duration = 1500; // ms
-        const incrementTime = 30; // ms
-        const steps = duration / incrementTime;
-        const increment = Math.ceil(value / steps);
+        let mounted = true;
+        const duration = 1200;
+        const frames = 45;
+        const increment = Math.max(1, Math.ceil(value / frames));
+        let current = 0;
 
         const timer = setTimeout(() => {
-            const counter = setInterval(() => {
-                start += increment;
-                if (start >= value) {
+            const interval = setInterval(() => {
+                if (!mounted) return;
+                current += increment;
+                if (current >= value) {
                     setAnimatedValue(value);
-                    clearInterval(counter);
+                    clearInterval(interval);
                 } else {
-                    setAnimatedValue(start);
+                    setAnimatedValue(current);
                 }
-            }, incrementTime);
-            return () => clearInterval(counter);
+            }, duration / frames);
         }, delay);
 
-        return () => clearTimeout(timer);
+        return () => {
+            mounted = false;
+            clearTimeout(timer);
+        };
     }, [value, delay]);
 
     return (
-        <div 
-            className={`relative overflow-hidden rounded-2xl shadow-sm border border-gray-100 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md animate-in fade-in zoom-in-95 fill-mode-both`}
+        <div
+            className="animated-border surface card-hover relative overflow-hidden p-6"
             style={{ animationDelay: `${delay}ms` }}
         >
-            <div className={`absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full opacity-10 ${gradientClass} blur-2xl`}></div>
-            
-            <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className={`p-3 rounded-xl ${colorClass}`}>
-                    <Icon size={24} />
+            <div className={`absolute -right-8 -top-8 h-32 w-32 rounded-full blur-3xl opacity-25 ${gradientClass}`} />
+            <div className="relative z-10 flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">{title}</p>
+                    <h3 className="mt-4 text-4xl font-extrabold tracking-tight text-white">{animatedValue}</h3>
                 </div>
-                <h3 className="text-gray-500 font-medium text-sm tracking-wide uppercase">{title}</h3>
-            </div>
-            
-            <div className="relative z-10">
-                <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-                    {animatedValue}
-                </h2>
+                <div className={`rounded-2xl p-3 ${colorClass}`}>
+                    <Icon size={22} />
+                </div>
             </div>
         </div>
     );

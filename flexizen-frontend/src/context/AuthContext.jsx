@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         const data = await authService.login(username, password);
-        setUser({ username: data.username, role: data.role });
+        setUser({ username: data.username, role: data.role, name: data.name, email: data.email });
         return data;
     };
 
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );

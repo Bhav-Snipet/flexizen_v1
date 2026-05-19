@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import { classService } from '../../services/classService';
 import { bookingService } from '../../services/bookingService';
-import { Calendar, Users, CheckCircle } from 'lucide-react';
+import { Calendar, Users, CheckCircle, ShieldCheck, Sparkles, ArrowLeft } from 'lucide-react';
 
 const DUMMY_CLASSES = [
     {
@@ -13,7 +13,7 @@ const DUMMY_CLASSES = [
         schedule: 'Mon / Wed / Fri — 7:00 AM to 8:00 AM',
         capacity: 20,
         active: true,
-        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 102,
@@ -22,7 +22,7 @@ const DUMMY_CLASSES = [
         schedule: 'Tue / Thu — 6:30 PM to 7:45 PM',
         capacity: 15,
         active: true,
-        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 103,
@@ -31,7 +31,7 @@ const DUMMY_CLASSES = [
         schedule: 'Sat / Sun — 9:00 AM to 10:30 AM',
         capacity: 18,
         active: true,
-        image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 104,
@@ -40,7 +40,7 @@ const DUMMY_CLASSES = [
         schedule: 'Mon / Wed — 5:00 PM to 6:15 PM',
         capacity: 20,
         active: true,
-        image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 105,
@@ -49,7 +49,7 @@ const DUMMY_CLASSES = [
         schedule: 'Tue / Thu / Sat — 7:00 AM to 8:30 AM',
         capacity: 12,
         active: true,
-        image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=900'
     }
 ];
 
@@ -66,22 +66,17 @@ const BookingForm = () => {
     useEffect(() => {
         const loadClassDetails = async () => {
             try {
-                // First try to fetch from backend
-                const activeClasses = await classService.getActiveClasses();
-                const cls = activeClasses.find(c => c.id === parseInt(classId));
-                if (cls) {
-                    setYogaClass(cls);
-                    setIsDemoMode(false);
-                } else {
-                    // Search in dummy classes
-                    const dummyCls = DUMMY_CLASSES.find(c => c.id === parseInt(classId));
-                    setYogaClass(dummyCls || null);
-                    setIsDemoMode(true);
+                const data = await classService.getActiveClasses();
+                const allClasses = data && data.length > 0 ? data : DUMMY_CLASSES;
+                const foundClass = allClasses.find(c => c.id.toString() === classId);
+                if (foundClass) {
+                    setYogaClass(foundClass);
+                    setIsDemoMode(!data || data.length === 0);
                 }
             } catch (error) {
-                console.warn("Backend down. Falling back to dummy classes details.", error);
-                const dummyCls = DUMMY_CLASSES.find(c => c.id === parseInt(classId));
-                setYogaClass(dummyCls || null);
+                console.warn("Failed to load live class details. Using demo class.", error);
+                const foundClass = DUMMY_CLASSES.find(c => c.id.toString() === classId);
+                setYogaClass(foundClass || DUMMY_CLASSES[0]);
                 setIsDemoMode(true);
             } finally {
                 setLoading(false);
@@ -103,11 +98,9 @@ const BookingForm = () => {
             setSuccess(true);
         } catch (error) {
             if (!error.response || isDemoMode) {
-                // If backend is offline or we are in Demo mode, simulate a successful booking
                 const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
                 const randomId = Math.floor(1000 + Math.random() * 9000);
                 const simulatedBookingNo = `FZ-${timestamp}${randomId}`;
-                
                 setBookingNo(simulatedBookingNo);
                 setSuccess(true);
             } else {
@@ -121,10 +114,10 @@ const BookingForm = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="app-shell flex min-h-screen flex-col">
                 <Navbar />
-                <div className="flex-1 flex justify-center items-center">
-                    <span className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></span>
+                <div className="flex flex-1 items-center justify-center">
+                    <span className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-indigo-400" />
                 </div>
             </div>
         );
@@ -132,91 +125,154 @@ const BookingForm = () => {
 
     if (!yogaClass) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="app-shell flex min-h-screen flex-col">
                 <Navbar />
-                <div className="flex-1 flex flex-col justify-center items-center">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Class Not Found</h2>
-                    <Link to="/classes" className="text-indigo-600 hover:underline">Return to Classes</Link>
+                <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+                    <p className="muted-kicker">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Class not found
+                    </p>
+                    <h2 className="mt-4 text-3xl font-bold text-white">We could not load this session.</h2>
+                    <Link to="/classes" className="btn-primary mt-6">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Return to Classes
+                    </Link>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="app-shell flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
-                
+            <main className="mx-auto flex w-full flex-1 max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
                 {success ? (
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="flex justify-center mb-6">
-                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-10 h-10 text-green-600" />
-                            </div>
+                    <div className="surface mx-auto w-full max-w-2xl p-8 text-center sm:p-12">
+                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+                            <CheckCircle className="h-10 w-10" />
                         </div>
-                        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Booking Successful!</h2>
-                        <p className="text-lg text-gray-600 mb-8">
-                            Your spot for <strong>{yogaClass.title}</strong> has been requested.
+                        <p className="muted-kicker mx-auto mt-6 w-fit">
+                            <ShieldCheck className="h-3.5 w-3.5" />
+                            Booking confirmed
                         </p>
-                        <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200 border-dashed">
-                            <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Your Booking Number</p>
-                            <p className="text-2xl font-mono font-bold text-indigo-700 tracking-wider">{bookingNo}</p>
+                        <h2 className="mt-5 text-3xl font-black tracking-tight text-white">Your spot has been reserved.</h2>
+                        <p className="mt-3 text-slate-300">
+                            A booking request for <span className="font-semibold text-white">{yogaClass.title}</span> was completed successfully.
+                        </p>
+
+                        <div className="animated-border mt-8 rounded-[1.6rem] bg-white/5 p-6">
+                            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Booking number</p>
+                            <p className="mt-3 break-all font-mono text-3xl font-bold tracking-wider text-indigo-200">{bookingNo}</p>
                         </div>
+
                         {isDemoMode && (
-                            <p className="text-xs text-yellow-600 font-medium bg-yellow-50 px-3 py-1 rounded-full mb-6 max-w-xs mx-auto border border-yellow-100">
-                                Showcase Demo Success Simulation
+                            <p className="mt-5 rounded-full border border-amber-400/20 bg-amber-500/10 px-4 py-2 text-xs font-medium text-amber-200">
+                                Demo mode generated this reference because the backend was unavailable.
                             </p>
                         )}
-                        <Link to="/classes" className="inline-flex items-center justify-center px-8 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-full font-semibold transition-colors">
-                            Browse More Classes
-                        </Link>
+
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                            <Link to="/classes" className="btn-primary">
+                                Browse More Classes
+                            </Link>
+                            <Link to="/" className="btn-secondary">
+                                Back to Home
+                            </Link>
+                        </div>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col md:flex-row">
-                        <div className="md:w-5/12 bg-indigo-600 text-white p-8 flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-2xl font-bold mb-4">{yogaClass.title}</h3>
-                                <p className="text-indigo-100 text-sm leading-relaxed mb-6">
-                                    {yogaClass.description}
-                                </p>
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-3 text-indigo-50">
-                                        <Calendar size={20} className="text-indigo-300" />
+                    <div className="grid w-full gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+                        <aside className="surface overflow-hidden">
+                            <div className="relative h-64 overflow-hidden">
+                                <img
+                                    src={yogaClass.image || 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1200'}
+                                    alt={yogaClass.title}
+                                    className="h-full w-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                                <div className="absolute left-4 top-4 muted-kicker">
+                                    <Sparkles className="h-3.5 w-3.5" />
+                                    Session preview
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                <h3 className="text-3xl font-bold tracking-tight text-white">{yogaClass.title}</h3>
+                                <p className="mt-4 text-sm leading-7 text-slate-300">{yogaClass.description}</p>
+
+                                <div className="mt-6 space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5">
+                                    <div className="flex items-center gap-3 text-sm text-slate-200">
+                                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-200">
+                                            <Calendar className="h-4 w-4" />
+                                        </span>
                                         <span>{yogaClass.schedule}</span>
                                     </div>
-                                    <div className="flex items-center space-x-3 text-indigo-50">
-                                        <Users size={20} className="text-indigo-300" />
-                                        <span>{yogaClass.capacity} Spots Available</span>
+                                    <div className="flex items-center gap-3 text-sm text-slate-200">
+                                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-500/15 text-violet-200">
+                                            <Users className="h-4 w-4" />
+                                        </span>
+                                        <span>{yogaClass.capacity} spots available</span>
                                     </div>
                                 </div>
+
+                                <p className="mt-6 text-sm text-slate-400">
+                                    No account required. Booking number is generated instantly after confirmation.
+                                </p>
                             </div>
-                            <div className="mt-8 pt-6 border-t border-indigo-500/30">
-                                <p className="text-sm text-indigo-200">No account required. Your booking number will be generated instantly.</p>
-                            </div>
-                        </div>
-                        <div className="md:w-7/12 p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Reserve Your Spot</h2>
-                            <form onSubmit={handleSubmit} className="space-y-5">
+                        </aside>
+
+                        <section className="surface p-6 sm:p-8">
+                            <p className="muted-kicker">
+                                <ShieldCheck className="h-3.5 w-3.5" />
+                                Reserve your spot
+                            </p>
+                            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white">Booking details</h2>
+                            <p className="mt-2 text-sm leading-7 text-slate-300">
+                                Fill in a few details to hold your place in this session.
+                            </p>
+
+                            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                                    <input type="text" required className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        placeholder="John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                    <label className="label-soft">Full Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="input-surface"
+                                        placeholder="John Doe"
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
-                                    <input type="tel" required className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        placeholder="+1 234 567 890" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                                    <label className="label-soft">Phone Number *</label>
+                                    <input
+                                        type="tel"
+                                        required
+                                        className="input-surface"
+                                        placeholder="+91 98765 43210"
+                                        value={formData.phone}
+                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                    />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                    <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        placeholder="john@example.com (Optional)" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                                    <label className="label-soft">Email Address</label>
+                                    <input
+                                        type="email"
+                                        className="input-surface"
+                                        placeholder="john@example.com (optional)"
+                                        value={formData.email}
+                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    />
                                 </div>
-                                <button type="submit" disabled={submitting} className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed mt-2">
+
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-70"
+                                >
                                     {submitting ? 'Processing...' : 'Confirm Booking'}
                                 </button>
                             </form>
-                        </div>
+                        </section>
                     </div>
                 )}
             </main>

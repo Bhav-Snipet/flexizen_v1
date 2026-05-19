@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Navbar from '../../components/common/Navbar';
 import ClassCard from '../../components/user/ClassCard';
 import { classService } from '../../services/classService';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Search, Filter, Waves, Flame, MoonStar } from 'lucide-react';
 
 const DUMMY_CLASSES = [
     {
@@ -12,7 +12,7 @@ const DUMMY_CLASSES = [
         schedule: 'Mon / Wed / Fri — 7:00 AM to 8:00 AM',
         capacity: 20,
         active: true,
-        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 102,
@@ -21,7 +21,7 @@ const DUMMY_CLASSES = [
         schedule: 'Tue / Thu — 6:30 PM to 7:45 PM',
         capacity: 15,
         active: true,
-        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 103,
@@ -30,7 +30,7 @@ const DUMMY_CLASSES = [
         schedule: 'Sat / Sun — 9:00 AM to 10:30 AM',
         capacity: 18,
         active: true,
-        image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 104,
@@ -39,7 +39,7 @@ const DUMMY_CLASSES = [
         schedule: 'Mon / Wed — 5:00 PM to 6:15 PM',
         capacity: 20,
         active: true,
-        image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&q=80&w=900'
     },
     {
         id: 105,
@@ -48,14 +48,23 @@ const DUMMY_CLASSES = [
         schedule: 'Tue / Thu / Sat — 7:00 AM to 8:30 AM',
         capacity: 12,
         active: true,
-        image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=600'
+        image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&q=80&w=900'
     }
+];
+
+const FILTERS = [
+    { key: 'all', label: 'All classes', icon: Filter },
+    { key: 'flow', label: 'Flow', icon: Waves },
+    { key: 'power', label: 'Power', icon: Flame },
+    { key: 'restorative', label: 'Restore', icon: MoonStar },
 ];
 
 const Classes = () => {
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isUsingDemoData, setIsUsingDemoData] = useState(false);
+    const [query, setQuery] = useState('');
+    const [activeFilter, setActiveFilter] = useState('all');
 
     useEffect(() => {
         const loadClasses = async () => {
@@ -65,60 +74,140 @@ const Classes = () => {
                     setClasses(data);
                     setIsUsingDemoData(false);
                 } else {
-                    // Fallback to high-quality dummy data if database is empty
                     setClasses(DUMMY_CLASSES);
                     setIsUsingDemoData(true);
                 }
             } catch (error) {
-                console.warn("Backend not running or empty. Loading elegant local dummy classes.", error);
+                console.warn("Could not fetch classes. Loading curated demo data.", error);
                 setClasses(DUMMY_CLASSES);
                 setIsUsingDemoData(true);
             } finally {
                 setLoading(false);
             }
         };
-
         loadClasses();
     }, []);
 
+    const visibleClasses = useMemo(() => {
+        const filtered = classes.filter((item) => {
+            const text = `${item.title} ${item.description} ${item.schedule}`.toLowerCase();
+            const searchMatch = text.includes(query.toLowerCase().trim());
+            if (!searchMatch) return false;
+
+            if (activeFilter === 'flow') return /flow|hatha|beginner/i.test(text);
+            if (activeFilter === 'power') return /power|ashtanga/i.test(text);
+            if (activeFilter === 'restorative') return /yin|meditation|restore|restorative/i.test(text);
+            return true;
+        });
+
+        return filtered;
+    }, [classes, query, activeFilter]);
+
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="app-shell flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="text-center mb-16 relative">
-                    <div className="inline-flex items-center space-x-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-semibold mb-3">
-                        <Sparkles size={14} className="animate-spin duration-3000" />
-                        <span>Book Instantly</span>
+            <main className="flex-1">
+                <section className="relative overflow-hidden border-b border-white/10">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=2200"
+                            alt="Yoga classes"
+                            className="h-full w-full object-cover opacity-15"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/95 to-indigo-950/90" />
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-                        Available Yoga Sessions
-                    </h1>
-                    <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                        Secure your spot in any class instantly with our zero-friction booking system. No upfront registration required.
-                    </p>
-                    
-                    {isUsingDemoData && (
-                        <div className="mt-4 inline-block text-xs bg-yellow-50 text-yellow-800 border border-yellow-100 rounded-full px-3 py-1 font-medium">
-                            Displaying Showcase Demo Sessions
+
+                    <div className="hero-orb left-6 top-12 h-56 w-56 bg-indigo-500/20 animate-glow" />
+                    <div className="hero-orb right-10 top-14 h-72 w-72 bg-violet-500/15 animate-float-y" />
+
+                    <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+                        <div className="max-w-3xl">
+                            <div className="muted-kicker">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                Explore the schedule
+                            </div>
+                            <h1 className="mt-5 text-4xl font-black tracking-tight text-white md:text-6xl">
+                                Classes designed for focus, strength, and recovery.
+                            </h1>
+                            <p className="mt-5 text-base leading-8 text-slate-300 md:text-lg">
+                                Browse the studio’s class lineup, filter by practice style, and book your ideal session in a clean, premium interface.
+                            </p>
+                        </div>
+
+                        <div className="mt-10 grid gap-4 md:grid-cols-[1.3fr_0.7fr]">
+                            <label className="surface flex items-center gap-3 px-5 py-4">
+                                <Search className="h-5 w-5 text-indigo-300" />
+                                <input
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    placeholder="Search by class name, schedule, or focus..."
+                                    className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
+                                />
+                            </label>
+
+                            <div className="surface flex items-center justify-center gap-2 p-2">
+                                {FILTERS.map((filter) => {
+                                    const Icon = filter.icon;
+                                    const active = activeFilter === filter.key;
+                                    return (
+                                        <button
+                                            key={filter.key}
+                                            type="button"
+                                            onClick={() => setActiveFilter(filter.key)}
+                                            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                                                active ? 'bg-white/10 text-white shadow-sm' : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                                            }`}
+                                        >
+                                            <Icon className="h-4 w-4" />
+                                            {filter.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                    <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h2 className="section-title">Session lineup</h2>
+                            <p className="section-subtitle">
+                                {isUsingDemoData
+                                    ? 'Demo content is displayed because the backend returned no classes.'
+                                    : 'Live classes loaded from the backend are shown below.'}
+                            </p>
+                        </div>
+                        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+                            <Filter className="h-4 w-4 text-indigo-300" />
+                            {visibleClasses.length} class{visibleClasses.length === 1 ? '' : 'es'}
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex min-h-[320px] items-center justify-center">
+                            <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-indigo-400" />
+                        </div>
+                    ) : visibleClasses.length === 0 ? (
+                        <div className="surface mx-auto max-w-xl p-10 text-center">
+                            <p className="text-lg font-semibold text-white">No classes match your search.</p>
+                            <p className="mt-2 text-sm text-slate-400">Try a different keyword or reset the filter.</p>
+                            <button
+                                type="button"
+                                onClick={() => { setQuery(''); setActiveFilter('all'); }}
+                                className="btn-primary mt-6"
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                            {visibleClasses.map((yogaClass, index) => (
+                                <ClassCard key={yogaClass.id} yogaClass={yogaClass} delay={index * 70} />
+                            ))}
                         </div>
                     )}
-                </div>
-
-                {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <span className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></span>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {classes.map((yogaClass, index) => (
-                            <ClassCard 
-                                key={yogaClass.id} 
-                                yogaClass={yogaClass} 
-                                delay={index * 100}
-                            />
-                        ))}
-                    </div>
-                )}
+                </section>
             </main>
         </div>
     );
