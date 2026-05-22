@@ -1,95 +1,105 @@
-# FlexiZen - Digital Yoga Studio Booking & Registration System
+# FlexiZen — Project README
 
-FlexiZen is a premium, modern digital booking and registration platform built for boutique yoga studios. It enables visitors to browse active yoga sessions, submit detailed enquiries with custom class contexts, and allows studio administrators to manage schedules, view notifications, track bookings, and reply directly to visitors via an integrated administrative interface.
+## Overview
+FlexiZen is a digital yoga registration and scheduling system with a public user experience and a protected admin panel.
 
----
+The current frontend includes:
+- a polished landing page with hero content and CTA buttons
+- a classes listing with session cards and booking flow
+- a booking/enquiry flow that carries the selected session forward
+- CMS-driven About and Contact pages
+- an admin login and admin dashboard
+- admin modules for classes, bookings, enquiries, pages, reports, search, and profile settings
 
-## 🌟 Key Features
+## What was verified in this environment
+- Frontend production build: `npm run build` ✅
+- Frontend lint check: `npm run lint` ✅
 
-### User Facing (Client App)
-*   **Active Classes Directory:** Filter and view real-time scheduled classes, including seat availability, descriptions, and class times.
-*   **Dynamic Enquiry Form:** Visitors can choose a target yoga class, input contact details (name, email, phone), and write notes/questions.
-*   **Responsive Modern UI:** Curated color palette, sleek glassmorphic containers, smooth interactive transitions, and responsive typography.
+## How to run the project
 
-### Administrative Console (Admin Dashboard)
-*   **In-App Notification Hub:** Real-time logging of new visitor enquiries and booking alerts.
-*   **Session Management (CRUD):** Create, update, toggle visibility, and delete yoga classes.
-*   **Enquiry Workflow:** Review incoming enquiries, mark them read/unread, and reply directly from the dashboard via a built-in email composing modal.
-*   **Content Management System (CMS):** Dynamically manage and edit public page content like "About Us" and "Contact Info".
-*   **Statistical Analytics Reports:** Simple charts and counters representing active classes, total bookings, read vs. unread enquiries, and seat utilization.
+### 1) Backend
+Requirements:
+- Java 17
+- Tomcat 10
+- PostgreSQL
 
----
+Steps:
+1. Create the PostgreSQL database used by the project.
+2. Update the datasource settings in `flexizen-backend/src/main/webapp/WEB-INF/applicationContext.xml` if your local database credentials are different.
+3. Deploy the generated WAR from `flexizen-backend/target/flexizen.war` to Tomcat 10.
+4. Start Tomcat.
 
-## 🛠️ Technology Stack
+Default admin credentials from the seed data:
+- Username: `admin`
+- Password: `Admin@123`
 
-### Backend Architecture
-*   **Language:** Java 17 (JDK 17)
-*   **Frameworks:** Spring Framework 6.x (Spring MVC, Spring Security, Spring Data JPA)
-*   **Persistence:** Hibernate 6.x (JPA 3.1 Specification)
-*   **Database:** PostgreSQL 17
-*   **Connection Pool:** HikariCP
-*   **Application Server:** Apache Tomcat 11.x (listening on port `8085`)
+### 2) Frontend
+```bash
+cd flexizen-frontend
+npm install
+npm run dev
+```
 
-### Frontend Architecture
-*   **Framework:** React 18 (with Vite)
-*   **Styling:** Tailwind CSS & Vanilla CSS Transitions
-*   **Icons:** Lucide React
-*   **HTTP Client:** Axios (configured with automated cookies/credentials transfer)
+Open the app at:
+- `http://localhost:5173`
 
----
+### 3) Optional frontend checks
+```bash
+npm run build
+npm run lint
+```
 
-## 🚀 Getting Started
+## Main features
 
-### 1. Database Setup
-1.  Ensure a PostgreSQL instance is running on your machine.
-2.  Connect to your PostgreSQL server and create a new database named `flexizen`:
-    ```sql
-    CREATE DATABASE flexizen;
-    ```
-3.  Execute the database scripts located in the backend resources:
-    *   First, run the schema definitions in:
-        `flexizen-backend/src/main/resources/db/schema.sql`
-    *   Next, populate initial seed records (admin accounts, CMS metadata, default classes) from:
-        `flexizen-backend/src/main/resources/db/data.sql`
+### User side
+- Home page with a premium hero section
+- Classes page with session cards and booking CTA
+- Booking / enquiry flow with selected session transfer
+- Session dropdown in enquiry form for direct selection
+- About Us CMS page
+- Contact Us CMS page with enquiry submission
 
-### 2. Backend Installation & Deployment
-1.  Open the backend database configuration:
-    `flexizen-backend/src/main/webapp/WEB-INF/applicationContext.xml`
-    *   Verify the datasource URL: `jdbc:postgresql://localhost:5432/flexizen`
-    *   Update the `username` and `password` properties to match your local PostgreSQL credentials.
-2.  Build and compile the WAR package using Maven:
-    ```bash
-    cd flexizen-backend
-    mvn clean package -DskipTests
-    ```
-3.  Deploy the built artifact `target/flexizen.war` to your Tomcat 11 instance. To run the API on the root URL path (`http://localhost:8085/`), deploy the war file as `ROOT.war` into Tomcat's `webapps/` folder:
-    ```bash
-    # Stop Tomcat, clear existing deployment and copy:
-    Remove-Item -Recurse -Force "D:\path\to\tomcat\webapps\ROOT"
-    Copy-Item "target/flexizen.war" "D:\path\to\tomcat\webapps\ROOT.war"
-    ```
-4.  Launch Tomcat. The backend APIs will be exposed under `http://localhost:8085/api/*`.
+### Admin side
+- Admin login
+- Dashboard with KPI cards and recent activity
+- Manage Classes
+- Manage Bookings
+- Enquiries inbox
+- CMS Pages editor
+- Reports view
+- Booking search
+- Profile and password settings
 
-### 3. Frontend Installation & Local Server
-1.  Navigate to the frontend workspace:
-    ```bash
-    cd flexizen-frontend
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Start the Vite local development server:
-    ```bash
-    npm run dev
-    ```
-    *   The app will start at `http://localhost:5173/` or `http://localhost:5174/`.
-    *   The development server has an integrated proxy mapping that forwards all client requests matching `/api/**` automatically to the Tomcat instance running at `http://localhost:8085`.
+## Preview gallery
 
----
+> Note: the local browser automation in this environment blocks direct navigation to local URLs, so the gallery below uses one real frontend screenshot from the project plus preview renders created from the final UI layout.
 
-## 👤 Default Credentials
+### Classes page screenshot
 
-For test login access to the administrative dashboard (`/admin`), use the pre-loaded seed account:
-*   **Username:** `admin`
-*   **Password:** `admin123`
+![Classes page screenshot](readme_assets/classes-actual.png)
+
+### Home preview
+
+![Home preview](readme_assets/home-preview.png)
+
+### Booking / enquiry preview
+
+![Booking and enquiry preview](readme_assets/booking-enquiry-preview.png)
+
+### About / Contact preview
+
+![About and contact preview](readme_assets/about-contact-preview.png)
+
+### Admin dashboard preview
+
+![Admin dashboard preview](readme_assets/admin-dashboard-preview.png)
+
+### Admin modules preview
+
+![Admin modules preview](readme_assets/admin-management-preview.png)
+
+## Notes
+- The frontend is built with Vite + React.
+- The project uses Tailwind CSS for styling.
+- The backend is Spring MVC / JPA / Spring Security based.
+- The public pages are designed to keep working even when backend data is unavailable by falling back to demo content where appropriate.
