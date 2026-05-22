@@ -22,7 +22,7 @@
   </authentication-manager>
 
   <!-- ===== HTTP Security Rules ===== -->
-  <http pattern="/api/**" use-expressions="true">
+  <http pattern="/api/**" use-expressions="true" entry-point-ref="restAuthenticationEntryPoint">
 
     <!-- Disable CSRF for REST (React sends JSESSIONID cookie via withCredentials) -->
     <csrf disabled="true"/>
@@ -33,8 +33,9 @@
     <!-- Public endpoints (no auth required) -->
     <intercept-url pattern="/api/auth/**"            access="permitAll"/>
     <intercept-url pattern="/api/user/**"            access="permitAll"/>
-    <intercept-url pattern="/api/classes/active"     access="permitAll"/>
-    <intercept-url pattern="/api/enquiries/submit"   access="permitAll"/>
+    <intercept-url pattern="/api/classes"           access="permitAll"/>
+    <intercept-url pattern="/api/enquiries"          access="permitAll"/>
+    <intercept-url pattern="/api/health"             access="permitAll"/>
 
     <!-- Admin-only endpoints -->
     <intercept-url pattern="/api/admin/**"           access="hasRole('ADMIN')"/>

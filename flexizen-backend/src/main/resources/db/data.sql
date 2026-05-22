@@ -1,15 +1,15 @@
 -- ============================================================
 -- FlexiZen — data.sql
 -- Seed data: default admin user + sample yoga classes + CMS pages
--- BCrypt hash below is for password: Admin@123
+-- BCrypt hash below is for password: admin123
 -- ============================================================
 
 -- ===== DEFAULT ADMIN USER =====
--- Username: admin | Password: Admin@123 (BCrypt strength 10)
+-- Username: admin | Password: admin123 (BCrypt strength 10)
 INSERT INTO admin (username, password, name, email)
 VALUES (
     'admin',
-    '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKat6Z5EHsM8lE9lBaUsl7iAt6Zu',
+    '$2a$10$5BXG8vDSUC2NkZC9yjuRkevgUti8oc01Y9Vb2U8Vdm8Nb0auBppiW',
     'FlexiZen Admin',
     'admin@flexizen.com'
 )

@@ -4,11 +4,11 @@
 -- ============================================================
 
 -- ===== 1. SEED DEFAULT ADMIN =====
--- Username: admin | Password: admin123 (BCrypt hash)
+-- Username: admin | Password: pass (BCrypt hash)
 INSERT INTO admin (username, password, name, email)
 VALUES (
     'admin',
-    '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKat6Z5EHsM8lE9lBaUsl7iAt6Zu',
+    '$2a$10$IvO29tsKuIpLoV58X/tIr.GzWc4nFEStLUoLGVd0asBd5iqAB4Pvy',
     'FlexiZen Admin',
     'admin@flexizen.com'
 )

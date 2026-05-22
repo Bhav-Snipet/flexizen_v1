@@ -25,6 +25,25 @@ public class EnquiryService {
         enquiry.setReadStatus(false);
         enquiryRepository.save(enquiry);
 
+        // NOTE: Email dispatch is disabled for demo purposes.
+        // To enable, configure SMTP credentials in applicationContext.xml and uncomment the block below.
+        // try {
+        //     String subject = "New FlexiZen Enquiry from " + enquiry.getName();
+        //     String body = "Dear Admin,\n\n" +
+        //             "A new enquiry has been submitted on FlexiZen.\n\n" +
+        //             "Details:\n" +
+        //             "Name: " + enquiry.getName() + "\n" +
+        //             "Email: " + enquiry.getEmail() + "\n" +
+        //             "Phone: " + (enquiry.getPhone() != null && !enquiry.getPhone().isBlank() ? enquiry.getPhone() : "N/A") + "\n" +
+        //             "Session: " + (enquiry.getSessionTitle() != null && !enquiry.getSessionTitle().isBlank() ? enquiry.getSessionTitle() : "General Enquiry") + "\n\n" +
+        //             "Message:\n" + enquiry.getMessage() + "\n\n" +
+        //             "Best regards,\n" +
+        //             "FlexiZen System";
+        //     emailService.sendEmail("bhav9bothare@gmail.com", subject, body);
+        // } catch (Exception ex) {
+        //     System.err.println("Failed to send email notification to admin: " + ex.getMessage());
+        // }
+
         // Trigger in-app notification (Future Scope)
         try {
             String sessionPart = (enquiry.getSessionTitle() != null && !enquiry.getSessionTitle().isBlank())
